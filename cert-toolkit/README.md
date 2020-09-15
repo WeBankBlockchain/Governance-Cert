@@ -29,12 +29,15 @@ cert-toolkit用于证书生成。支持轻量级jar包接入。
 通过git下载源码：
 
 ```
-git clone https://gitee.com/graysonzhang/pkey-gen
+https://github.com/WeBankBlockchain/ca-center.git
 ```
 
 进入目录：
 ```
-cd pkey-gen
+cd ca-center
+git checkout dev
+git pull
+cd cert-toolkit
 ```
 
 ### 2. 编译源码
@@ -51,7 +54,7 @@ chmod +x ./gradlew && ./gradlew build -x test
 
 ### 3. 导入jar包
 
-cert-toolkit编译之后在根目录下会生成dist文件夹，文件夹中包含cert-toolkit.jar。可以将cert-toolkit.jar导入到自己的项目中，例如libs目录下。然后进行依赖配置。gradle依赖配置如下，然后再对自己的项目进行编译。
+cert-toolkit编译之后在cert-toolkit目录下会生成dist文件夹，文件夹中包含cert-toolkit.jar。可以将cert-toolkit.jar导入到自己的项目中，例如libs目录下。然后进行依赖配置。gradle依赖配置如下，然后再对自己的项目进行编译。
 
 ```
 repositories {

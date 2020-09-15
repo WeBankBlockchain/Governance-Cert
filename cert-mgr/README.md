@@ -25,12 +25,15 @@ cert-mgr用于证书托管，适合B2B2C场景。
 通过git下载源码：
 
 ```
-git clone https://gitee.com/graysonzhang/pkey-mgr
+https://github.com/WeBankBlockchain/ca-center.git
 ```
 
 进入目录：
 ```
-cd pkey-mgr
+cd ca-center
+git checkout dev
+git pull
+cd cert-mgr
 ```
 
 ### 2. 编译源码
@@ -47,7 +50,7 @@ chmod +x ./gradlew && ./gradlew build -x test
 
 ### 3. 导入jar包
 
-cert-mgr编译之后在根目录下会生成dist文件夹，文件夹中包含cert-mgr.jar。可以将cert-mgr.jar导入到自己的项目中，例如拷贝到libs目录下，然后进行依赖配置。gradle推荐依赖配置如下，然后再对自己的项目进行编译。
+cert-mgr编译之后在cert-mgr目录下会生成dist文件夹，文件夹中包含cert-mgr.jar。可以将cert-mgr.jar导入到自己的项目中，例如拷贝到libs目录下，然后进行依赖配置。gradle推荐依赖配置如下，然后再对自己的项目进行编译。
 
 ```
 repositories {
