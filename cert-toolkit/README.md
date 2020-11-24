@@ -29,14 +29,12 @@ cert-toolkit用于证书生成。支持轻量级jar包接入。
 通过git下载源码：
 
 ```
-https://github.com/WeBankBlockchain/ca-center.git
+git clone https://github.com/WeBankBlockchain/Gov-Cert.git
 ```
 
 进入目录：
 ```
-cd ca-center
-git checkout dev
-git pull
+cd Gov-Cert
 cd cert-toolkit
 ```
 

@@ -25,14 +25,12 @@ cert-mgr用于证书托管，适合B2B2C场景。
 通过git下载源码：
 
 ```
-https://github.com/WeBankBlockchain/ca-center.git
+git clone https://github.com/WeBankBlockchain/Gov-Cert.git
 ```
 
 进入目录：
 ```
-cd ca-center
-git checkout dev
-git pull
+cd Gov-Cert
 cd cert-mgr
 ```
 
