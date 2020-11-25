@@ -1,4 +1,4 @@
-rootProject.name = 'ca-center'
+rootProject.name = 'Gov-Cert'
 include 'cert-mgr'
 include 'cert-toolkit'
 
