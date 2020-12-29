@@ -43,7 +43,7 @@ public class CertRequestInfo extends IdEntity {
     @Column(name = "parent_cert_id")
     private Long pCertId;
 
-    @Column(name = "parent_cert_userId")
+    @Column(name = "parent_cert_user_id")
     private String pCertUserId;
 
     @Column(name = "subject_org")
