@@ -58,7 +58,7 @@ public class CertService {
             CertUtils.writeCrt(certificate, savePath + "/" + "ca.crt");
             log.info("CA certificate save success, file path :~" + savePath + "/" + "ca.crt");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("generateKPAndRootCert failed ,", e);
         }
     }
 
@@ -149,7 +149,7 @@ public class CertService {
             }
             return CertUtils.readPEMAsString(certificate);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("generateRootCertByDefaultConf failed ,", e);
         }
         return null;
     }
@@ -268,7 +268,7 @@ public class CertService {
             }
             return CertUtils.readPEMAsString(childCert);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("generateChildCertByDefaultConf failed ,", e);
         }
         return null;
     }
@@ -295,7 +295,6 @@ public class CertService {
                     beginDate, endDate, publicKey, privateKey);
         } catch (Exception e) {
             log.error("X509CertHandler.createRootCert failed ", e);
-            e.printStackTrace();
         }
         return rootCert;
     }
@@ -322,7 +321,6 @@ public class CertService {
                     beginDate, endDate, privateKey);
         } catch (Exception e) {
             log.error("X509CertHandler.createChildCert failed ", e);
-            e.printStackTrace();
         }
         return childCert;
     }
@@ -344,7 +342,6 @@ public class CertService {
             request = X509CertHandler.createCSR(new X500Name(subject.toString()), pubKey, priKey, signAlg);
         } catch (OperatorCreationException e) {
             log.error("X509CertHandler.createCSR failed ", e);
-            e.printStackTrace();
         }
         return request;
     }
