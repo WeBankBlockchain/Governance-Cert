@@ -97,6 +97,9 @@ public class KeyUtils {
 
 	public static KeyPair getRSAKeyPair(String privateStr) throws Exception {
 		PEMKeyPair pemObject = (PEMKeyPair) CertUtils.readStringAsPEM(privateStr);
+		if (pemObject == null) {
+			throw new RuntimeException("missing pemPrivateKey string coding");
+		}
 		PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(
 				new PKCS8EncodedKeySpec(pemObject.getPrivateKeyInfo().getEncoded()));
 		PublicKey publicKey = getRSAPublicKey(privateKey);

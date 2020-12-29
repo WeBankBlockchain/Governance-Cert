@@ -208,8 +208,8 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
                 .organizationName("fisco-bcos")
                 .organizationalUnitName("chain")
                 .build();
-        String userId = "wangyue";
-        String cert = certManagerService.createRootCert(userId,issuer);
+        String userId = "bob";
+        CertVO cert = certManagerService.createRootCert(userId,issuer);
         System.out.println(cert);
     }
 
@@ -220,11 +220,10 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
                 .organizationName("fisco-bcos")
                 .organizationalUnitName("chain")
                 .build();
-        String userId = "wangyue";
+        String userId = "bob";
         Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);
-        String cert = certManagerService.createRootCert(userId,issuer,beginDate,endDate);
-        System.out.println(cert);
+        CertVO cert = certManagerService.createRootCert(userId,issuer,beginDate,endDate);
     }
 
     @Test
@@ -234,12 +233,11 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
                 .organizationName("fisco-bcos")
                 .organizationalUnitName("chain")
                 .build();
-        String userId = "wangyue";
+        String userId = "bob";
         Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);
         KeyUsage keyUsage = new KeyUsage(KeyUsage.dataEncipherment);
-        String cert = certManagerService.createRootCert(userId,1,issuer,keyUsage,beginDate,endDate);
-        System.out.println(cert);
+        CertVO cert = certManagerService.createRootCert(userId,1,issuer,keyUsage,beginDate,endDate);
     }
 
     @Test
@@ -249,13 +247,12 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
                 .organizationName("fisco-bcos")
                 .organizationalUnitName("chain")
                 .build();
-        String userId = "wangyue";
+        String userId = "bob";
         Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);
         String pemPriKey = "此处填入私钥";
 
-        String str = certManagerService.createRootCert(userId,pemPriKey,KeyAlgorithmEnums.RSA,issuer,beginDate,endDate);
-        System.out.println(str);
+        CertVO str = certManagerService.createRootCert(userId,pemPriKey,KeyAlgorithmEnums.RSA,issuer,beginDate,endDate);
     }
 ```
 
@@ -288,13 +285,12 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
                 .organizationName("fisco-bcos")
                 .organizationalUnitName("chain")
                 .build();
-        String userId = "wangyue";
+        String userId = "bob";
         Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);
         KeyPair keyPair = KeyUtils.generateKeyPair();
         String hexPriKey = Numeric.toHexString(keyPair.getPrivate().getEncoded());
-        String cert = certManagerService.createRootCertByHexPriKey(userId,hexPriKey,KeyAlgorithmEnums.RSA,issuer,beginDate,endDate);
-        System.out.println(cert);
+        CertVO cert = certManagerService.createRootCertByHexPriKey(userId,hexPriKey,KeyAlgorithmEnums.RSA,issuer,beginDate,endDate);
     }
 ```
 执行过后，会生成根证书并保存
@@ -324,10 +320,9 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
                 .organizationName("fisco-bcos")
                 .organizationalUnitName("agancy")
                 .build();
-        String userId = "wangyue1";
-        String csr;
+        String userId = "bob1";
+        CertRequestVO csr;
         csr = certManagerService.createCertRequest(userId,1, subject);
-        System.out.println(csr);
     }
 
     @Test
@@ -337,16 +332,15 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
                 .organizationName("fisco-bcos")
                 .organizationalUnitName("agancy")
                 .build();
-        String userId = "wangyue1";
+        String userId = "bob1";
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDSA", "BC");
         ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec("secp256k1");
         keyPairGenerator.initialize(ecGenParameterSpec, new SecureRandom());
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         PrivateKey privateKey = keyPair.getPrivate();
 
-        String csr = certManagerService.createCertRequest(userId, CertUtils.readPEMAsString(privateKey),
+        CertRequestVO csr = certManagerService.createCertRequest(userId, CertUtils.readPEMAsString(privateKey),
                 KeyAlgorithmEnums.ECDSA,1,subject);
-        System.out.println(csr);
     }
 
 ```
@@ -377,10 +371,9 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
                 .organizationName("fisco-bcos")
                 .organizationalUnitName("agancy")
                 .build();
-        String userId = "wangyue";
+        String userId = "bob";
         String hexPriKey = "3500db68433dda968ef7bfe5a0ed6926b8e85aabcd2caa54f8327ca07ac73526";
-        String cert = certManagerService.createCertRequestByHexPriKey(userId,hexPriKey,KeyAlgorithmEnums.ECDSA,3,subject);
-        System.out.println(cert);
+        CertRequestVO cert = certManagerService.createCertRequestByHexPriKey(userId,hexPriKey,KeyAlgorithmEnums.ECDSA,3,subject);
     }
 
 ```
@@ -406,10 +399,9 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
 ```
     @Test
     public void testCreateChildCert() throws Exception{
-        String userId = "wangyue1";
+        String userId = "bob1";
         String child;
-        child = certManagerService.createChildCert(userId,4);
-        System.out.println(child);
+        CertVO = certManagerService.createChildCert(userId,4);
     }
 ```
 执行过后，会生成子证书并保存
@@ -428,13 +420,12 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
 ```
     @Test
     public void testResetCertificate() throws Exception{
-        String userId = "wangyue1";
+        String userId = "bob1";
         Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);
-        String root = certManagerService.resetCertificate(userId,9,
+        CertVO root = certManagerService.resetCertificate(userId,9,
                 new KeyUsage(KeyUsage.dataEncipherment),
                 beginDate,endDate);
-        System.out.println(root);
     }
 ```
 
@@ -460,10 +451,9 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
 ```
     @Test
     public void testQueryCertList() {
-        String userId = "wangyue";
+        String userId = "bob";
         List<CertVO> list = certManagerService.queryCertList(
                 userId,null,null,null,null,null);
-        System.out.println();
     }
 ```
 
@@ -491,10 +481,9 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
 ```
     @Test
     public void testQueryCertRequestList() {
-        String userId = "wangyue";
-        List<CertRequestInfo> list = certManagerService.queryCertRequestList(
-                userId,null,null,null,null);
-        System.out.println();
+        String userId = "bob";
+        List<CertRequestVO> list = certManagerService.queryCertRequestList(
+                userId,null,null,null,null,null);
     }
 ```
 
@@ -520,9 +509,8 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
 ```
     @Test
     public void testQueryCertKeyList() {
-        String userId = "wangyue";
+        String userId = "bob";
         List<CertKeyVO> list = certManagerService.queryCertKeyList(userId);
-        System.out.println();
     }
 ```
 
@@ -541,7 +529,6 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
  @Test
     public void testQueryCertInfoByCertId() {
         CertVO certInfo = certManagerService.queryCertInfoByCertId(1L);
-        System.out.println();
     }    
 ```
 
@@ -559,7 +546,6 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
     @Test
     public void testQueryCertRequestByCsrId() {
         CertRequestVO keyRequestVO = certManagerService.queryCertRequestByCsrId(1L);
-        System.out.println();
     }  
 ```
 
@@ -578,7 +564,6 @@ CertManagerService类是证书管理的统一入口，覆盖证书管理的全�
     @Test
     public void testExportCertToFile() throws Exception {
         certManagerService.exportCertToFile(1L,"src/ca.crt");
-        System.out.println();
     }
 ```
 

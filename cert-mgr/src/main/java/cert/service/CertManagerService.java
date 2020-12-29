@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.security.Security;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x9.X962Parameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.BigIntegers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,6 +49,12 @@ import org.web3j.utils.Numeric;
 public class CertManagerService {
     @Autowired
     private CertHandler certHandler;
+
+    static {
+        if (Security.getProvider("BC") == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+    }
 
     public CertManagerService() {
     }

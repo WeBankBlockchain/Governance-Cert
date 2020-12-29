@@ -64,35 +64,21 @@ repositories {
 }
 
 dependencies {
-    compile "org.apache.commons:commons-lang3:3.6"
-    compile 'com.lhalcyon:bip32:1.0.0'
-    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.60'
-    compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.60'
-    compile 'org.web3j:core:3.4.0'
-    compile "commons-io:commons-io:2.6"
-    compile 'com.lambdaworks:scrypt:1.4.0'
-    compile 'commons-codec:commons-codec:1.9'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
     compile fileTree(dir:'libs',include:['*.jar'])
 }
 
 ```
 ### 4. 接口使用
 
-cert-toolkit中包含若干类服务接口，如下，接口使用可以直接通过new对象然后调用，同时也支持依赖注入的方式使用。
+cert-toolkit中包含若干类服务接口，如下，接口使用可以通过new对象然后调用
 
 - CertService：证书的生成
 
-依赖注入使用前需添加组件扫描，如下所示：
 
 ```java
-@SpringBootApplication
-@ComponentScan(basePackages = { "com.webank.cert" })
-public class PkeytestApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(PkeytestApplication.class, args);
-	}
-}
+
+CertService certService =new CertService();
+
 ```
 
 
@@ -110,8 +96,7 @@ CertService提供了三种功能接口：
 - generateKPAndRootCert：生成密钥对和根证书
 
 ```java
-@Autowired
-private CertService certService;
+private CertService certService = new CertService();
 
 private static final String SIGNATURE_ALGORITHM = "SHA256WITHRSA";
 
@@ -132,7 +117,7 @@ public void testGenerateRootCertByDefaultConf(){
             .organizationName("fisco-bcos")
             .organizationalUnitName("chain")
             .build();
-    String caKey = "";
+    String caKey = "[输入私钥key pem string]";
     String caStr = certService.generateRootCertByDefaultConf(info,caKey);
     System.out.println(caStr);
 }
