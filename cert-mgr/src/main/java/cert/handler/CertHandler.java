@@ -49,8 +49,14 @@ public class CertHandler {
 
 
     public long importPrivateKey(String userId, String pemPrivateKey, String priAlg) throws Exception {
-        if (StringUtils.isBlank(userId)){
+        if (StringUtils.isBlank(userId)) {
             throw new CertMgrException(MgrExceptionCodeEnums.PKEY_MGR_ACCOUNT_NOT_EXIST);
+        }
+        try {
+            KeyPair keyPair = KeyUtils.getRSAKeyPair(pemPrivateKey);
+        }catch (Exception e){
+            log.error("importPrivateKey failed, reason :", e);
+            return 0;
         }
         CertKeyInfo certKeyInfo = new CertKeyInfo();
         certKeyInfo.setKeyAlg(priAlg);
