@@ -210,8 +210,14 @@ public class CertService {
         } catch (Exception e) {
             log.error("string convert pemObject failed ", e);
         }
-        if (parentCert == null || request == null || parentPriKey == null) {
-            return null;
+        if (parentCert == null) {
+            throw new RuntimeException("caStr can not convert to certificate");
+        }
+        if (request == null) {
+            throw new RuntimeException("csrStr can not convert to csr");
+        }
+        if (parentPriKey == null) {
+            throw new RuntimeException("caStr can not convert to key");
         }
         Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);
