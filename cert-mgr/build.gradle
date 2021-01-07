@@ -53,6 +53,9 @@ dependencies {
     compile "org.apache.commons:commons-lang3:3.6"
     compile "com.alibaba:fastjson:1.2.29"
     compile "commons-io:commons-io:2.6"
+    compile('ch.qos.logback:logback-core:1.2.3')
+    compile('ch.qos.logback:logback-classic:1.2.3')
+
 
     compile "com.fasterxml.jackson.core:jackson-core:2.9.6"
     compile "com.fasterxml.jackson.core:jackson-databind:2.9.6"

@@ -41,7 +41,7 @@ public class CertService {
     public void generateKPAndRootCert(X500NameInfo issuer, String savePath) {
         try {
             if (!FileOperationUtils.exist(savePath)) {
-                throw new FileNotFoundException("savePath does't exist，path = " + savePath);
+                throw new FileNotFoundException("savePath does't exist, path = " + savePath);
             }
             Date beginDate = new Date();
             Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);
@@ -165,7 +165,7 @@ public class CertService {
     public String generateCertRequestByDefaultConf(X500NameInfo subject, String priKey, String exportFilePath) {
         try {
             if (exportFilePath != null && !FileOperationUtils.exist(exportFilePath)) {
-                throw new FileNotFoundException("exportFilePath does't exist，path = " + exportFilePath);
+                throw new FileNotFoundException("exportFilePath does't exist, path = " + exportFilePath);
             }
             PrivateKey privateKey = null;
             PublicKey publicKey = null;
@@ -241,16 +241,16 @@ public class CertService {
                                                  String keyPath, String exportFilePath) {
         try {
             if (!FileOperationUtils.exist(caPath)) {
-                throw new FileNotFoundException("caPath does't exist，path = " + caPath);
+                throw new FileNotFoundException("caPath does't exist, path = " + caPath);
             }
             if (!FileOperationUtils.exist(csrPth)) {
-                throw new FileNotFoundException("csrPth does't exist，path = " + csrPth);
+                throw new FileNotFoundException("csrPth does't exist, path = " + csrPth);
             }
             if (!FileOperationUtils.exist(keyPath)) {
-                throw new FileNotFoundException("keyPath does't exist，path = " + csrPth);
+                throw new FileNotFoundException("keyPath does't exist, path = " + csrPth);
             }
             if (exportFilePath != null && !FileOperationUtils.exist(exportFilePath)) {
-                throw new FileNotFoundException("exportFilePath does't exist，path = " + csrPth);
+                throw new FileNotFoundException("exportFilePath does't exist, path = " + csrPth);
             }
             Date beginDate = new Date();
             Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);
@@ -288,7 +288,7 @@ public class CertService {
      * @param keyUsage   scenarios where the certificate can be used
      * @param beginDate  beginDate of the certificate
      * @param endDate    endDate of the certificate
-     * @param publicKey  the public key bound by the certificate，used to decrypt the signature
+     * @param publicKey  the public key bound by the certificate,used to decrypt the signature
      * @param privateKey the private key used for encryption to generate the signature
      * @return the generated certificate
      */
@@ -336,7 +336,7 @@ public class CertService {
      * create CertificationRequest
      *
      * @param subject subject of the csr
-     * @param pubKey  the public key bound by the certificate，used to decrypt the signature
+     * @param pubKey  the public key bound by the certificate,used to decrypt the signature
      * @param priKey  the private key used for encryption to generate the signature
      * @param signAlg signature algorithm,the type of the corresponding key
      * @return the certificate request
