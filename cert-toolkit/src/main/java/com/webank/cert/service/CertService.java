@@ -7,11 +7,13 @@ import com.webank.cert.model.X500NameInfo;
 import com.webank.cert.handler.X509CertHandler;
 import com.webank.cert.constants.CertConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -30,7 +32,6 @@ import java.util.Date;
 @Slf4j
 public class CertService {
 
-
     /**
      * generate RSA keyPair and CA certificate by default configuration (signature algorithm is SHA256WITHRSA,
      * valid for 3650 days) , the generated certificate and key will be saved in file that specifies the path
@@ -39,24 +40,34 @@ public class CertService {
      * @param savePath path of the generated keys and certificate
      */
     public void generateKPAndRootCert(X500NameInfo issuer, String savePath) {
+        generateKPAndRootCert(issuer,savePath,"ca");
+    }
+
+    /**
+     * generate RSA keyPair and CA certificate by default configuration (signature algorithm is SHA256WITHRSA,
+     * valid for 3650 days) , the generated certificate and key will be saved in file that specifies the path
+     *
+     * @param issuer   issuer information
+     * @param savePath path of the generated keys and certificate
+     * @param fileName filename
+     */
+    public void generateKPAndRootCert(X500NameInfo issuer, String savePath, String fileName) {
         try {
-            if (!FileOperationUtils.exist(savePath)) {
-                throw new FileNotFoundException("savePath does't exist, path = " + savePath);
-            }
+            FileOperationUtils.mkdir(savePath + "/" + fileName);
             Date beginDate = new Date();
             Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);
             KeyPair keyPair = KeyUtils.generateKeyPair();
             PrivateKey privateKey = keyPair.getPrivate();
             PublicKey publicKey = keyPair.getPublic();
-            CertUtils.writeKey(privateKey, savePath + "/" + "ca_pri.key");
-            log.info("privateKey save success, file path :~" + savePath + "/" + "ca_pri.key");
-            CertUtils.writeKey(publicKey, savePath + "/" + "ca_pub.key");
-            log.info("publicKey save success, file path :~" + savePath + "/" + "ca_pub.key");
+            CertUtils.writeKey(privateKey, savePath + "/" + fileName + "/" + "ca_pri.key");
+            log.info("privateKey save success, file path :~" + savePath + "/" + fileName + "/" + "ca_pri.key");
+            CertUtils.writeKey(publicKey, savePath + "/" + fileName + "/" + "ca_pub.key");
+            log.info("publicKey save success, file path :~" + savePath + "/" + fileName + "/" + "ca_pub.key");
 
             X509Certificate certificate = createRootCertificate(CertConstants.DEFAULT_SIGNATURE_ALGORITHM, issuer,
                     null, beginDate, endDate, publicKey, privateKey);
-            CertUtils.writeCrt(certificate, savePath + "/" + "ca.crt");
-            log.info("CA certificate save success, file path :~" + savePath + "/" + "ca.crt");
+            CertUtils.writeCrt(certificate, savePath + "/" + fileName + "/" + "ca.crt");
+            log.info("CA certificate save success, file path :~" + savePath + "/" + fileName + "/" + "ca.crt");
         } catch (Exception e) {
             log.error("generateKPAndRootCert failed ,", e);
         }
@@ -179,7 +190,7 @@ public class CertService {
             }
             return CertUtils.readPEMAsString(request);
         } catch (Exception e) {
-            log.error("Error generate csr",e);
+            log.error("Error generate csr", e);
         }
         return null;
     }
@@ -197,7 +208,7 @@ public class CertService {
      */
     public String generateChildCertByDefaultConf(boolean isCaCert, KeyUsage keyUsage, String caStr, String csrStr,
                                                  String priKeyStr) {
-        if (caStr == null || csrStr == null || priKeyStr == null){
+        if (caStr == null || csrStr == null || priKeyStr == null) {
             throw new NullPointerException("param null");
         }
         X509Certificate parentCert = null;

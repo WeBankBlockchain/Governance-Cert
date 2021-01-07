@@ -70,6 +70,16 @@ public class CertServiceTest extends BaseTest {
     }
 
     @Test
+    public void testGenerateKPAndRootCert0() throws Exception {
+        X500NameInfo info = X500NameInfo.builder()
+                .commonName("chain")
+                .organizationName("fisco-bcos")
+                .organizationalUnitName("chain")
+                .build();
+        certService.generateKPAndRootCert(info,"out","company");
+    }
+
+    @Test
     public void testGenerateRootCertByDefaultConf() throws Exception {
         X500NameInfo info = X500NameInfo.builder()
                 .commonName("chain")
