@@ -111,8 +111,8 @@ public class CertService {
      * @param exportFilePath file path of  generated certificate
      * @return string of generated certificate
      */
-    public String generateChildCertByDefaultConf(String caPath, String csrPath, String keyPath, String exportFilePath) {
-        return generateChildCertByDefaultConf(true, null, caPath, csrPath, keyPath, exportFilePath);
+    public String generateChildCertByDefaultConf(String caPath, String csrPath, String keyPath, String exportFilePath, String certName) {
+        return generateChildCertByDefaultConf(true, null, caPath, csrPath, keyPath, exportFilePath, certName );
     }
 
     /**
@@ -123,7 +123,7 @@ public class CertService {
      * @return string of generated certRequest
      */
     public String generateCertRequestByDefaultConf(X500NameInfo subject, String priKey) {
-        return generateCertRequestByDefaultConf(subject, priKey, null);
+        return generateCertRequestByDefaultConf(subject, priKey, null,null);
     }
 
     /**
@@ -141,7 +141,7 @@ public class CertService {
                 throw new NullPointerException("privateKeyStr is null");
             }
             if (certSavePath != null && !FileOperationUtils.exist(certSavePath)) {
-                throw new FileNotFoundException("certSavePath does't exist, path = " + certSavePath);
+                FileOperationUtils.mkdir(certSavePath);
             }
             Date beginDate = new Date();
             Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);
@@ -177,7 +177,7 @@ public class CertService {
      * @param exportFilePath save path of generated certRequest
      * @return string of generated certRequest
      */
-    public String generateCertRequestByDefaultConf(X500NameInfo subject, String priKey, String exportFilePath) {
+    public String generateCertRequestByDefaultConf(X500NameInfo subject, String priKey, String exportFilePath, String csrName) {
         try {
             if (exportFilePath != null && !FileOperationUtils.exist(exportFilePath)) {
                 FileOperationUtils.mkdir(exportFilePath);
@@ -189,7 +189,7 @@ public class CertService {
             PKCS10CertificationRequest request = createCertRequest(subject, publicKey, privateKey,
                     CertConstants.DEFAULT_SIGNATURE_ALGORITHM);
             if (exportFilePath != null) {
-                CertUtils.writeCsr(request, exportFilePath);
+                CertUtils.writeCsr(request, exportFilePath + "/" + csrName + ".csr");
                 log.info("PKCS10CertificationRequest save success, file path :~" + exportFilePath);
             }
             return CertUtils.readPEMAsString(request);
@@ -253,7 +253,7 @@ public class CertService {
      * @return string of the generated certificate
      */
     public String generateChildCertByDefaultConf(boolean isCaCert, KeyUsage keyUsage, String caPath, String csrPth,
-                                                 String keyPath, String exportFilePath) {
+                                                 String keyPath, String exportFilePath, String certName) {
         try {
             if (!FileOperationUtils.exist(caPath)) {
                 throw new FileNotFoundException("caPath does't exist, path = " + caPath);
@@ -284,7 +284,7 @@ public class CertService {
                 log.error("X509CertHandler.createChildCert failed ", e);
             }
             if (exportFilePath != null) {
-                CertUtils.writeCrt(childCert, exportFilePath);
+                CertUtils.writeCrt(childCert, exportFilePath + "/" + certName + ".crt");
                 log.info("CA certificate save success, file path :~" + exportFilePath);
             }
             return CertUtils.readPEMAsString(childCert);

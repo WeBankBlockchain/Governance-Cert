@@ -60,12 +60,10 @@ import java.security.spec.PKCS8EncodedKeySpec;
 @Slf4j
 public class CertUtils {
 
-	private static SecureRandom random;
 	static {
 		if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
 			Security.addProvider(new BouncyCastleProvider());
 		}
-		random = new SecureRandom();
 	}
 
 	private static SubjectKeyIdentifier getSubjectKeyId(final PublicKey publicKey) throws OperatorCreationException {
