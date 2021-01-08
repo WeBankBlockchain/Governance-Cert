@@ -5,8 +5,6 @@ import cert.enums.MgrExceptionCodeEnums;
 
 /**
  * @author wesleywang
- * @Description:
- * @date 2020/8/28
  */
 public class CertMgrException extends Exception {
     /** @Fields serialVersionUID : TODO */

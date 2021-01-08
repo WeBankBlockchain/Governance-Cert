@@ -6,8 +6,6 @@ import java.io.Serializable;
 
 /**
  * @author wesleywang
- * @Description:
- * @date 2020-05-20
  */
 @Data
 public class CertRequestVO implements Serializable {

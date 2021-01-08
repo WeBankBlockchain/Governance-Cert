@@ -19,14 +19,6 @@ import cert.utils.TransformUtils;
 import com.webank.cert.model.X500NameInfo;
 import com.webank.cert.utils.CertUtils;
 import com.webank.cert.utils.KeyUtils;
-import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.Security;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Date;
-import java.util.List;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
@@ -44,6 +36,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.web3j.crypto.ECKeyPair;
 import org.web3j.utils.Numeric;
+
+import java.math.BigInteger;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class CertManagerService {
@@ -169,9 +170,18 @@ public class CertManagerService {
         return (CertVO)TransformUtils.simpleTransform(certInfo, CertVO.class);
     }
 
+
+    public List<CertVO> queryCertInfoList() {
+        return queryCertList(null, null, null, null, null, null);
+    }
+
     public List<CertVO> queryCertList(String userId, Long issuerKeyId, Long pCertId, String issuerOrg, String issuerCN, Boolean isCACert) {
         List<CertInfo> certInfos = this.certHandler.queryCertInfoList(userId, issuerKeyId, pCertId, issuerOrg, issuerCN, isCACert);
         return TransformUtils.simpleTransform(certInfos, CertVO.class);
+    }
+
+    public List<CertRequestVO> queryCertRequestList() {
+        return queryCertRequestList(null, null, null, null, null, null);
     }
 
     public List<CertRequestVO> queryCertRequestList(String userId, Long subjectKeyId, Long pCertId, String subjectOrg, String subjectCN, String pCertUserId) {

@@ -21,9 +21,7 @@ import lombok.ToString;
 /**
  * ExceptionCodeEnums
  *
- * @Description: ExceptionCodeEnums
  * @author graysonzhang
- * @data 2019-07-02 16:38:13
  *
  */
 @Getter

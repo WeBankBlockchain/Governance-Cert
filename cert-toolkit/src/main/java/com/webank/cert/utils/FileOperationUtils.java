@@ -19,14 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * FileUtils
- *
- * @Description: FileUtils
  * @author graysonzhang
- * @data 2019-07-14 18:59:01
- *
  */
 @Slf4j
 public class FileOperationUtils {
@@ -38,6 +35,13 @@ public class FileOperationUtils {
         }
         File file = new File(filePath);
         return file.exists();
+    }
+
+    public static void mkdir(String filePath) throws IOException {
+        if (exist(filePath)){
+            return;
+        }
+        new File(filePath).mkdir();
     }
 
 }

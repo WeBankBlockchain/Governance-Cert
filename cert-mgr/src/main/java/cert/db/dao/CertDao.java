@@ -14,8 +14,6 @@ import java.util.List;
 
 /**
  * @author wesleywang
- * @Description:
- * @date 2020-05-19
  */
 @Service
 public class CertDao {
