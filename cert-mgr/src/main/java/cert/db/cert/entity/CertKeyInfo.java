@@ -14,8 +14,6 @@ import javax.persistence.Table;
 
 /**
  * @author wesleywang
- * @Description:
- * @date 2020-05-20
  */
 @Data
 @Accessors(chain = true)

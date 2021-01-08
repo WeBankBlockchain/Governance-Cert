@@ -23,11 +23,7 @@ import java.io.IOException;
 
 /**
  * FileUtils
- *
- * @Description: FileUtils
  * @author graysonzhang
- * @data 2019-07-14 18:59:01
- *
  */
 @Slf4j
 public class FileOperationUtils {

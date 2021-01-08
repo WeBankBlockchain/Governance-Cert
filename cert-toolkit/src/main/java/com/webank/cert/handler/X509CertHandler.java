@@ -30,8 +30,6 @@ import java.util.Random;
  * X509CertHandler
  *
  * @author wesleywang
- * @Description: X509CertHandler
- * @date 2020-05-09
  */
 public class X509CertHandler {
 

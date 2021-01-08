@@ -6,8 +6,6 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author wesleywang
- * @Description:
- * @date 2020-05-25
  */
 @Configuration
 public class CertBeans {

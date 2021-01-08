@@ -2,8 +2,6 @@ package com.webank.cert.constants;
 
 /**
  * @author wesleywang
- * @Description: CertConstants
- * @date 2020-05-13
  */
 public class CertConstants {
 

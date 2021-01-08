@@ -1,19 +1,17 @@
 package com.webank.cert.service;
 
+import com.webank.cert.constants.CertConstants;
+import com.webank.cert.handler.X509CertHandler;
+import com.webank.cert.model.X500NameInfo;
 import com.webank.cert.utils.CertUtils;
 import com.webank.cert.utils.FileOperationUtils;
 import com.webank.cert.utils.KeyUtils;
-import com.webank.cert.model.X500NameInfo;
-import com.webank.cert.handler.X509CertHandler;
-import com.webank.cert.constants.CertConstants;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -26,8 +24,6 @@ import java.util.Date;
  * CertService
  *
  * @author wesleywang
- * @Description CertService
- * @date 2020-05-10
  */
 @Slf4j
 public class CertService {
@@ -176,7 +172,7 @@ public class CertService {
     public String generateCertRequestByDefaultConf(X500NameInfo subject, String priKey, String exportFilePath) {
         try {
             if (exportFilePath != null && !FileOperationUtils.exist(exportFilePath)) {
-                throw new FileNotFoundException("exportFilePath does't exist, path = " + exportFilePath);
+                FileOperationUtils.mkdir(exportFilePath);
             }
             PrivateKey privateKey = null;
             PublicKey publicKey = null;
@@ -261,7 +257,7 @@ public class CertService {
                 throw new FileNotFoundException("keyPath does't exist, path = " + csrPth);
             }
             if (exportFilePath != null && !FileOperationUtils.exist(exportFilePath)) {
-                throw new FileNotFoundException("exportFilePath does't exist, path = " + csrPth);
+                FileOperationUtils.mkdir(exportFilePath);
             }
             Date beginDate = new Date();
             Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);

@@ -26,8 +26,6 @@ import java.io.IOException;
 
 /**
  * @author wesleywang
- * @Description:
- * @date 2020/6/18
  */
 @Configuration
 @Data

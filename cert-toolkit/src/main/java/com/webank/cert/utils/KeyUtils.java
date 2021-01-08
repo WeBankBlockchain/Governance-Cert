@@ -15,7 +15,6 @@
  */
 package com.webank.cert.utils;
 
-import com.webank.cert.utils.CertUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -41,10 +40,8 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Collections;
 
 /**
- * @Description KeyUtils
  * @author yuzhichu
  * @author wesleywang
- * @date 2019-12-23 
  */
 @Slf4j
 public class KeyUtils {

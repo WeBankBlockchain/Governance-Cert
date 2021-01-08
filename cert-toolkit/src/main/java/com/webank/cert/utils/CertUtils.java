@@ -63,50 +63,18 @@ import java.time.Instant;
 import java.util.Date;
 
 /**
- * @Description CertUtils
  * @author yuzhichu
  * @author wesleywang
- * @date 2019-12-25 
  */
 @Slf4j
 public class CertUtils {
-	
-	private static JcaContentSignerBuilder signerBuilder = new JcaContentSignerBuilder("SHA1withRSA");
-	private static JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
+
 	private static SecureRandom random;
 	static {
 		if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
 			Security.addProvider(new BouncyCastleProvider());
 		}
 		random = new SecureRandom();
-	}
-	
-	public static X509Certificate generateDummyCertificate()
-					throws Exception
-	{
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", BouncyCastleProvider.PROVIDER_NAME);
-		keyPairGenerator.initialize(4096, random);
-		KeyPair keyPair = keyPairGenerator.generateKeyPair();
-		final Instant now = Instant.now();
-		final Date notBefore = Date.from(now);
-		final Date notAfter = Date.from(now.plus(Duration.ofDays(10000)));
-
-		final ContentSigner contentSigner = signerBuilder.build(keyPair.getPrivate());
-		final X500Name x500Name = new X500Name("CN=whatever");
-		final X509v3CertificateBuilder certificateBuilder =
-				new JcaX509v3CertificateBuilder(x500Name,
-						BigInteger.valueOf(now.toEpochMilli()),
-						notBefore,
-						notAfter,
-						x500Name,
-						keyPair.getPublic())
-				.addExtension(Extension.subjectKeyIdentifier, false, getSubjectKeyId(keyPair.getPublic()))
-				.addExtension(Extension.authorityKeyIdentifier, false, getAuthorityKeyId(keyPair.getPublic()))
-				.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
-
-		return certConverter
-				.setProvider(new BouncyCastleProvider())
-				.getCertificate(certificateBuilder.build(contentSigner));
 	}
 
 	private static SubjectKeyIdentifier getSubjectKeyId(final PublicKey publicKey) throws OperatorCreationException {

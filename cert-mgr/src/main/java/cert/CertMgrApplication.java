@@ -9,8 +9,6 @@ public class CertMgrApplication {
     public static void main(String[] args) {
         SpringApplication.run(CertMgrApplication.class, args);
     }
-    
-    //(exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class,
-    //DataSourceTransactionManagerAutoConfiguration.class })
+
 
 }

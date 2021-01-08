@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author wesleywang
- * @Description:
- * @date 2020-05-20
  */
 @Getter
 @ToString

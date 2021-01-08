@@ -9,8 +9,6 @@ import java.util.List;
 
 /**
  * @author wesleywang
- * @Description:
- * @date 2020-05-20
  */
 @Repository
 public interface CertKeyInfoRepository extends JpaRepository<CertKeyInfo, Long>,

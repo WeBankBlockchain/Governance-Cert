@@ -10,8 +10,6 @@ import java.util.List;
 
 /**
  * @author wesleywang
- * @Description:
- * @date 2020-05-19
  */
 @Repository
 public interface CertRequestInfoRepository extends JpaRepository<CertRequestInfo, Long>,
