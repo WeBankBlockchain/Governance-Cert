@@ -17,27 +17,22 @@ package com.webank.cert.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509ExtensionUtils;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CRLConverter;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculator;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.util.io.pem.PemReader;
 
@@ -47,20 +42,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
 
 /**
  * @author yuzhichu
@@ -126,6 +117,20 @@ public class CertUtils {
 		return null;
 	}
 
+	public static X509CRL readCrl(String filePath) throws FileNotFoundException, CRLException {
+		Object object = readPEMObject(filePath);
+		if (object instanceof X509CRLHolder) {
+			return new JcaX509CRLConverter().setProvider("BC")
+					.getCRL((X509CRLHolder) object);
+		}
+		return null;
+	}
+
+	public static void writeCrl(X509CRL crl, String filePath) {
+		writeToFile(crl, filePath);
+	}
+
+
 	public static X509Certificate convertStrToCert(String crtStr) throws CertificateException {
 		Object object = readStringAsPEM(crtStr);
 		if (object instanceof X509CertificateHolder) {
@@ -143,7 +148,7 @@ public class CertUtils {
 		return null;
 	}
 
-	public static void writeCrt(X509Certificate certificate, String filePath) throws FileNotFoundException {
+	public static void writeCrt(X509Certificate certificate, String filePath) {
 		writeToFile(certificate, filePath);
 	}
 
@@ -155,7 +160,7 @@ public class CertUtils {
 		return null;
 	}
 
-	public static void writeCsr(PKCS10CertificationRequest request, String filePath) throws FileNotFoundException {
+	public static void writeCsr(PKCS10CertificationRequest request, String filePath) {
 		writeToFile(request, filePath);
 	}
 
@@ -232,4 +237,10 @@ public class CertUtils {
 		}
 		return object;
 	}
+
+
+
+
+
+
 }

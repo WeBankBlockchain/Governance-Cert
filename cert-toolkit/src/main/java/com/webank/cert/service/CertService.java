@@ -13,11 +13,19 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 import java.io.FileNotFoundException;
+import java.math.BigInteger;
 import java.security.KeyPair;
+import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CRLException;
+import java.security.cert.X509CRL;
+import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -358,5 +366,130 @@ public class CertService {
         }
         return request;
     }
+
+    /**
+     * revoke certificate
+     * @param caCertificate Certificate of ca
+     * @param caPrivateKey PrivateKey of ca
+     * @param revokeCertificates revokeCertificates
+     * @param signAlg signAlg
+     * @return X509CRL
+     */
+    public X509CRL createCRL(X509Certificate caCertificate,
+                             PrivateKey caPrivateKey,
+                             List<X509Certificate> revokeCertificates,
+                             String signAlg) {
+        return createCRL(caCertificate,caPrivateKey,revokeCertificates,signAlg,1,null);
+    }
+
+    /**
+     * revoke certificate
+     * @param caCertificate Certificate of ca
+     * @param caPrivateKey PrivateKey of ca
+     * @param revokeCertificates revokeCertificates
+     * @param signAlg signAlg
+     * @param reason the reason code, as indicated in CRLReason, i.e CRLReason.keyCompromise, or 0 if not to be used.
+     * @param period date of next CRL update
+     * @return X509CRL
+     */
+    public X509CRL createCRL(X509Certificate caCertificate,
+                             PrivateKey caPrivateKey,
+                             List<X509Certificate> revokeCertificates,
+                             String signAlg,
+                             int reason,
+                             Date period) {
+        X509CRL x509CRL = null;
+        try {
+            x509CRL = X509CertHandler.revokeCert(caCertificate, caPrivateKey, revokeCertificates,signAlg, reason, period);
+        } catch (OperatorCreationException | CRLException e) {
+            log.error("X509CertHandler.createCSR failed ", e);
+        }
+        return x509CRL;
+    }
+
+    /**
+     * verify cert
+     * @param X509certificateRoot root X509Certificate
+     * @param X509CertificateChain chain of X509Certificate
+     * @return result of verify
+     */
+    public boolean verify(X509Certificate X509certificateRoot, List<X509Certificate> X509CertificateChain) {
+        return verify(X509certificateRoot,X509CertificateChain,null);
+    }
+
+    /**
+     * verify cert
+     * @param X509certificateRoot root X509Certificate
+     * @param X509CertificateChain chain of X509Certificate
+     * @param X509crl certificate revocation lists
+     * @return result of verify
+     */
+    public boolean verify(X509Certificate X509certificateRoot, List<X509Certificate> X509CertificateChain, X509CRL X509crl) {
+        int nSize = X509CertificateChain.size();
+        X509Certificate[] arX509certificate = new X509Certificate[nSize];
+        X509CertificateChain.toArray(arX509certificate);
+        List<BigInteger> list = new ArrayList<>();
+        //chain validation
+        Principal principalLast = null;
+        for (int i = 0; i < nSize; i++) {
+            X509Certificate x509Certificate = arX509certificate[i];
+            Principal principalIssuer = x509Certificate.getIssuerDN();
+            Principal principalSubject = x509Certificate.getSubjectDN();
+            list.add(x509Certificate.getSerialNumber());
+
+            if (principalLast != null) {
+                if (principalIssuer.equals(principalLast)) {
+                    try {
+                        PublicKey publickey = arX509certificate[i - 1].getPublicKey();
+                        arX509certificate[i].verify(publickey);
+                    } catch (Exception e) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            principalLast = principalSubject;
+        }
+        // revoke validation
+        if (X509crl != null) {
+            try {
+                if (!X509crl.getIssuerDN().equals(X509certificateRoot.getSubjectDN()))
+                    return false;
+                X509crl.verify(X509certificateRoot.getPublicKey());
+            } catch (Exception e) {
+                return false;
+            }
+            try {
+                Set setEntries = X509crl.getRevokedCertificates();
+                if (setEntries != null && !setEntries.isEmpty()) {
+                    for (Object setEntry : setEntries) {
+                        X509CRLEntry X509crlentry = (X509CRLEntry) setEntry;
+                        if (list.contains(X509crlentry.getSerialNumber()))
+                            return false;
+                    }
+                }
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        // data validation
+        try {
+            PublicKey publickey = X509certificateRoot.getPublicKey();
+            arX509certificate[0].verify(publickey);
+        } catch (Exception e) {
+            return false;
+        }
+        Date date = new Date();
+        for (int i = 0; i < nSize; i++) {
+            try {
+                arX509certificate[i].checkValidity(date);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 }
