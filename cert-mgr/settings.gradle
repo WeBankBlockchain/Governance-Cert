@@ -1,2 +1,3 @@
 rootProject.name = 'cert-mgr'
-
+include ":cert-toolkit"
+project(':cert-toolkit').projectDir = new File('../cert-toolkit')
