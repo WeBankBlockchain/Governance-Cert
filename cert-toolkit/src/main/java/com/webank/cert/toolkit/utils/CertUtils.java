@@ -65,6 +65,7 @@ public class CertUtils {
 		}
 	}
 
+
 	private static SubjectKeyIdentifier getSubjectKeyId(final PublicKey publicKey) throws OperatorCreationException {
 		final SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
 		final DigestCalculator digCalc =
