@@ -95,7 +95,7 @@ jar {
     exclude '**/*.xml'
     exclude '**/*.properties'
     exclude '**/*.yml'
-    from configurations.provided.files.collect { it.getName().contains("key-toolkit")?zipTree(it):null}
+    from configurations.provided.files.collect { it.getName().contains("cert-toolkit")?zipTree(it):null}
     doLast {
         copy {
             from file('src/main/resources/')
