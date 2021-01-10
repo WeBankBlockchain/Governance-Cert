@@ -9,5 +9,5 @@ cert-toolkit用于证书生成。支持轻量级jar包接入。
 *   证书文件的读写
 
 ## 文档
-- [**中文**](https://gov-doc.readthedocs.io/zh_CN/latest/docs/WeBankBlockchain-Gov-Cert/index.html)
-- [**cer-toolkit使用**](https://gov-doc.readthedocs.io/zh_CN/latest/docs/WeBankBlockchain-Gov-Cert/quickstart1.html)
+- [**中文**](https://gov-doc.readthedocs.io/zh_CN/dev/docs/WeBankBlockchain-Gov-Cert/index.html)
+- [**cer-toolkit使用**](https://gov-doc.readthedocs.io/zh_CN/dev/docs/WeBankBlockchain-Gov-Cert/quickstart1.html)
