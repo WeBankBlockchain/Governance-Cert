@@ -57,20 +57,20 @@ public class CertService {
      */
     public void generateKPAndRootCert(X500NameInfo issuer, String savePath, String fileName) {
         try {
-            FileOperationUtils.mkdir(savePath + "/" + fileName);
+            FileOperationUtils.mkdir(savePath);
             Date beginDate = new Date();
             Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);
             KeyPair keyPair = KeyUtils.generateKeyPair();
             PrivateKey privateKey = keyPair.getPrivate();
             PublicKey publicKey = keyPair.getPublic();
-            CertUtils.writeKey(privateKey, savePath + "/" + fileName + ".key");
-            log.info("privateKey save success, file path :~" + savePath + "/" + fileName + ".key");
-            CertUtils.writeKey(publicKey, savePath + "/" + fileName + ".key");
-            log.info("publicKey save success, file path :~" + savePath + "/" + fileName + ".key");
+            CertUtils.writeKey(privateKey, savePath + "/" + fileName + "_pri.key");
+            log.info("privateKey save success, file path :~" + savePath + "/" + fileName + "_pri.key");
+            CertUtils.writeKey(publicKey, savePath + "/" + fileName + "_pub.key");
+            log.info("publicKey save success, file path :~" + savePath + "/" + fileName + "_pub.key");
 
             X509Certificate certificate = createRootCertificate(CertConstants.DEFAULT_SIGNATURE_ALGORITHM, issuer,
                     null, beginDate, endDate, publicKey, privateKey);
-            CertUtils.writeCrt(certificate, savePath + "/" + fileName + "/" + ".crt");
+            CertUtils.writeCrt(certificate, savePath + "/" + fileName + ".crt");
             log.info("CA certificate save success, file path :~" + savePath + "/" + fileName + ".crt");
         } catch (Exception e) {
             log.error("generateKPAndRootCert failed ,", e);
