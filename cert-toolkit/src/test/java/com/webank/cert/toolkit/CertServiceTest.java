@@ -102,7 +102,7 @@ public class CertServiceTest extends BaseTest {
         System.out.println(childStr);
         //第二种方式：参数为文件路径
         String childStr2 = certService.generateChildCertByDefaultConf("out/ca.crt","out/agency.csr",
-                "out/ca_pri.key", "out/childByFile.crt");
+                "out/ca_pri.key", "out","certChain");
         System.out.println(childStr2);
     }
 
