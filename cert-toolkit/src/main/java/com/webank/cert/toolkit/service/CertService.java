@@ -3,8 +3,8 @@ package com.webank.cert.toolkit.service;
 import com.webank.cert.toolkit.constants.CertConstants;
 import com.webank.cert.toolkit.handler.X509CertHandler;
 import com.webank.cert.toolkit.model.X500NameInfo;
-import com.webank.cert.toolkit.utils.KeyUtils;
 import com.webank.cert.toolkit.utils.CertUtils;
+import com.webank.cert.toolkit.utils.KeyUtils;
 import com.webank.cert.toolkit.utils.FileOperationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -57,21 +57,21 @@ public class CertService {
      */
     public void generateKPAndRootCert(X500NameInfo issuer, String savePath, String fileName) {
         try {
-            FileOperationUtils.mkdir(savePath + "/" + fileName);
+            FileOperationUtils.mkdir(savePath);
             Date beginDate = new Date();
             Date endDate = new Date(beginDate.getTime() + CertConstants.DEFAULT_VALIDITY);
             KeyPair keyPair = KeyUtils.generateKeyPair();
             PrivateKey privateKey = keyPair.getPrivate();
             PublicKey publicKey = keyPair.getPublic();
-            CertUtils.writeKey(privateKey, savePath + "/" + fileName + "/" + "ca_pri.key");
-            log.info("privateKey save success, file path :~" + savePath + "/" + fileName + "/" + "ca_pri.key");
-            CertUtils.writeKey(publicKey, savePath + "/" + fileName + "/" + "ca_pub.key");
-            log.info("publicKey save success, file path :~" + savePath + "/" + fileName + "/" + "ca_pub.key");
+            CertUtils.writeKey(privateKey, savePath + "/" + fileName + "_pri.key");
+            log.info("privateKey save success, file path :~" + savePath + "/" + fileName + "_pri.key");
+            CertUtils.writeKey(publicKey, savePath + "/" + fileName + "_pub.key");
+            log.info("publicKey save success, file path :~" + savePath + "/" + fileName + "_pub.key");
 
             X509Certificate certificate = createRootCertificate(CertConstants.DEFAULT_SIGNATURE_ALGORITHM, issuer,
                     null, beginDate, endDate, publicKey, privateKey);
-            CertUtils.writeCrt(certificate, savePath + "/" + fileName + "/" + "ca.crt");
-            log.info("CA certificate save success, file path :~" + savePath + "/" + fileName + "/" + "ca.crt");
+            CertUtils.writeCrt(certificate, savePath + "/" + fileName + ".crt");
+            log.info("CA certificate save success, file path :~" + savePath + "/" + fileName + ".crt");
         } catch (Exception e) {
             log.error("generateKPAndRootCert failed ,", e);
         }
@@ -85,7 +85,7 @@ public class CertService {
      * @return string of generated certificate
      */
     public String generateRootCertByDefaultConf(X500NameInfo issuer, String privateKeyStr) {
-        return generateRootCertByDefaultConf(issuer, privateKeyStr, null);
+        return generateRootCertByDefaultConf(issuer, privateKeyStr, null,null);
     }
 
     /**
@@ -135,7 +135,7 @@ public class CertService {
      * @param certSavePath  save path of generated certificate
      * @return string of generated certificate
      */
-    public String generateRootCertByDefaultConf(X500NameInfo issuer, String privateKeyStr, String certSavePath) {
+    public String generateRootCertByDefaultConf(X500NameInfo issuer, String privateKeyStr, String certSavePath, String fileName) {
         try {
             if (privateKeyStr == null) {
                 throw new NullPointerException("privateKeyStr is null");
@@ -159,8 +159,8 @@ public class CertService {
             X509Certificate certificate = createRootCertificate(CertConstants.DEFAULT_SIGNATURE_ALGORITHM, issuer,
                     null, beginDate, endDate, publicKey, privateKey);
             if (certSavePath != null) {
-                CertUtils.writeCrt(certificate, certSavePath + "/" + "ca.crt");
-                log.info("CA certificate save success, file path :~" + certSavePath + "/" + "ca.crt");
+                CertUtils.writeCrt(certificate, certSavePath + "/" + fileName +  ".crt");
+                log.info("CA certificate save success, file path :~" + certSavePath + "/" + fileName + ".crt");
             }
             return CertUtils.readPEMAsString(certificate);
         } catch (Exception e) {
