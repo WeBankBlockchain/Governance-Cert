@@ -66,7 +66,7 @@ public class CertServiceTest extends BaseTest {
                 .organizationName("fisco-bcos")
                 .organizationalUnitName("chain")
                 .build();
-        certService.generateKPAndRootCert(info,"out");
+        certService.generateKPAndRootCert(info,"out/ca","ca1");
     }
 
     @Test
@@ -93,14 +93,10 @@ public class CertServiceTest extends BaseTest {
 
     @Test
     public void testGenerateChildCertByDefaultConf() throws Exception {
-        //填入：ca证书字符串
         String caStr = "";
-        //填入：子证书请求字符串
         String csrStr = "";
-        //第一种方式：参数为字符串
         String childStr = certService.generateChildCertByDefaultConf(caStr,csrStr,caKey);
         System.out.println(childStr);
-        //第二种方式：参数为文件路径
         String childStr2 = certService.generateChildCertByDefaultConf("out/ca.crt","out/agency.csr",
                 "out/ca_pri.key", "out","certChain");
         System.out.println(childStr2);
@@ -154,7 +150,6 @@ public class CertServiceTest extends BaseTest {
                 .organizationalUnitName("agency")
                 .organizationName("fisco-bcos")
                 .build();
-        //ECDSA密钥对，用于节点密钥对
 //        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDSA", "BC");
 //        ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec("secp256k1");
 //        keyPairGenerator.initialize(ecGenParameterSpec, SECURE_RANDOM);
