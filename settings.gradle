@@ -1,0 +1,4 @@
+rootProject.name = 'Governance-Cert'
+include 'cert-mgr'
+include 'cert-toolkit'
+
