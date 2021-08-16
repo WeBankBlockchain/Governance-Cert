@@ -102,7 +102,11 @@ public class KeyUtils {
 	 */
 	public static KeyPair generateSM2KeyPair() throws NoSuchProviderException, NoSuchAlgorithmException,
 			InvalidAlgorithmParameterException {
-		return generateECKeyPair(DOMAIN_PARAMS, random);
+		BouncyCastleProvider provider = new BouncyCastleProvider();
+		ECGenParameterSpec genParameterSpec = new ECGenParameterSpec("sm2p256v1");
+		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC", provider);
+		keyPairGenerator.initialize(genParameterSpec, new SecureRandom());
+		return keyPairGenerator.generateKeyPair();
 	}
 
 	public static AsymmetricCipherKeyPair generateSM2KeyPairParameter() {
