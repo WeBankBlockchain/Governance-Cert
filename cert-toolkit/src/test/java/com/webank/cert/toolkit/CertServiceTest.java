@@ -4,6 +4,8 @@ import com.webank.cert.toolkit.model.X500NameInfo;
 import com.webank.cert.toolkit.service.CertService;
 import com.webank.cert.toolkit.utils.CertUtils;
 import com.webank.cert.toolkit.utils.KeyUtils;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.Test;
@@ -32,6 +34,7 @@ public class CertServiceTest extends BaseTest {
         }
     }
     private static final String SIGNATURE_ALGORITHM = "SHA256WITHRSA";
+    private static final String SIGNATURE_SM2 = "SM3WITHSM2";
 
     private String caKey = "MIIEowIBAAKCAQEAp5hBxXPHSlY5KtuBWExboMLboVzDPtlypJ6cEeAT8o8mFFUG\n" +
             "LDgSjtTD+zjFYOaLg1d83GcLl0SDBQoaTdZQzoQ7HQHirSyk25kaHR3vdaVSBLE6\n" +
@@ -140,6 +143,28 @@ public class CertServiceTest extends BaseTest {
         certificate.verify(publicKey);
         new File("out").mkdirs();
         CertUtils.writeCrt(certificate,"out/ca.crt");
+    }
+
+    @Test
+    public void testCreateGMRootCertificate() throws Exception {
+        X500NameInfo info = X500NameInfo.builder()
+                .commonName("chain")
+                .organizationName("fisco-bcos")
+                .organizationalUnitName("chain")
+                .build();
+
+        KeyPair keyPair = KeyUtils.generateSM2KeyPair();
+
+        BCECPublicKey publicKey = (BCECPublicKey) keyPair.getPublic();
+        BCECPrivateKey privateKey = (BCECPrivateKey) keyPair.getPrivate();
+        Date beginDate = new Date();
+        Date endDate = new Date(beginDate.getTime() + 3650 * 24L * 60L * 60L * 1000);
+        X509Certificate certificate = certService.createRootCertificate(SIGNATURE_SM2, info,
+                null, beginDate, endDate, publicKey, privateKey);
+        certificate.verify(publicKey);
+        new File("out").mkdirs();
+        CertUtils.writeKey(privateKey, "out/ca.key");
+        CertUtils.writeCrt(certificate, "out/ca.crt");
     }
 
 
