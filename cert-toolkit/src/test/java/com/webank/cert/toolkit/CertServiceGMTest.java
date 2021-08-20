@@ -1,25 +1,28 @@
 package com.webank.cert.toolkit;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.HexUtil;
+import cn.hutool.core.util.StrUtil;
+import com.webank.cert.toolkit.encrypt.PemEncrypt;
+import com.webank.cert.toolkit.enums.EccTypeEnums;
+import com.webank.cert.toolkit.handler.SM2KeyHandler;
 import com.webank.cert.toolkit.model.X500NameInfo;
 import com.webank.cert.toolkit.service.CertService;
 import com.webank.cert.toolkit.utils.CertUtils;
-import com.webank.cert.toolkit.utils.KeyUtils;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
-import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.fisco.bcos.sdk.crypto.keypair.CryptoKeyPair;
+import org.fisco.bcos.sdk.crypto.keypair.SM2KeyPair;
+import org.fisco.bcos.sdk.crypto.keystore.KeyTool;
 import org.junit.Test;
 import org.web3j.utils.Numeric;
 
 import java.io.File;
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
 
 public class CertServiceGMTest extends BaseTest {
@@ -35,137 +38,231 @@ public class CertServiceGMTest extends BaseTest {
 
     private static final String SIGNATURE_SM2 = "SM3WITHSM2";
 
-    private String caKey = "-----BEGIN EC PRIVATE KEY-----\n" +
-            "MHcCAQEEIBlYxwtjYXAW3pviI8p2htzNdOM2khfvs3i7epahNa+joAoGCCqBHM9V\n" +
-            "AYItoUQDQgAETJpDArYUMa2PhMhrReFh8OJZwxrN5W/cLF9SJxmEvlaMFIan1vnf\n" +
-            "FGF153YGZev5Hg7Jez02AuETP3ldIXhtWg==\n" +
-            "-----END EC PRIVATE KEY-----";
+    private String caKey = "-----BEGIN PRIVATE KEY-----\n" +
+            "MIGHAgEAMBMGByqGSM49AgEGCCqBHM9VAYItBG0wawIBAQQgKlhdkyDVEyXTNKwB\n" +
+            "LxG0DIY1LRkvIl0OVIYxMpirSwGhRANCAATbwLNhEtyBheIYfZc/2NWXNLzDiNZI\n" +
+            "S6ZEqJnLJcQvUBjfMqDla3hqnCDGLODgqUV81b+m1E0JzF9tEap+RwWb\n" +
+            "-----END PRIVATE KEY-----\n";
 
 
     @Test
-    public void testCreateGMRootCertificateByKey() throws Exception {
+    public void testCreateRootCertificateByKey() throws Exception {
         X500NameInfo info = X500NameInfo.builder()
                 .commonName("chain")
                 .organizationName("fisco-bcos")
                 .organizationalUnitName("chain")
                 .build();
 
-        KeyPair keyPair = KeyUtils.getECKeyPair(caKey);
+        byte[] bytes = PemEncrypt.decryptPrivateKey(caKey);
+        KeyPair keyPair = SM2KeyHandler.generateSM2KeyPair(Numeric.toHexStringNoPrefix(bytes)).getKeyPair();
 
-        BCECPublicKey publicKey = (BCECPublicKey) keyPair.getPublic();
-        BCECPrivateKey privateKey = (BCECPrivateKey) keyPair.getPrivate();
-        Date beginDate = new Date(1629129600000l);
+        Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + 3650 * 24L * 60L * 60L * 1000);
         X509Certificate certificate = certService.createRootCertificate(SIGNATURE_SM2, info,
-                null, beginDate, endDate, publicKey, privateKey);
-        certificate.verify(publicKey);
+                null, beginDate, endDate, keyPair.getPublic(), keyPair.getPrivate());
+        certificate.verify(keyPair.getPublic());
         new File("out").mkdirs();
-        CertUtils.writeKey(privateKey, "out/ca.key");
-        CertUtils.writeCrt(certificate, "out/ca.crt");
+        FileUtil.writeUtf8String(caKey, FileUtil.newFile("out/gmca1.key"));
+        CertUtils.writeCrt(certificate, "out/gmca1.crt");
     }
 
     @Test
-    public void testCreateGMRootCertificate() throws Exception {
+    public void testCreateRootCertificate() throws Exception {
         X500NameInfo info = X500NameInfo.builder()
                 .commonName("chain")
                 .organizationName("fisco-bcos")
                 .organizationalUnitName("chain")
                 .build();
 
-        KeyPair keyPair = KeyUtils.generateSM2KeyPair();
+        CryptoKeyPair cryptoKeyPair = SM2KeyHandler.generateSM2KeyPair();
+        KeyPair keyPair = cryptoKeyPair.getKeyPair();
+        String encryptPrivateKey = PemEncrypt.encryptPrivateKey(Numeric.hexStringToByteArray(cryptoKeyPair.getHexPrivateKey()),
+                EccTypeEnums.SM2P256V1);
 
-        BCECPublicKey publicKey = (BCECPublicKey) keyPair.getPublic();
-        BCECPrivateKey privateKey = (BCECPrivateKey) keyPair.getPrivate();
-        Date beginDate = new Date(1629129600000l);
+        Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + 3650 * 24L * 60L * 60L * 1000);
-        X509Certificate certificate = certService.createRootCertificate(SIGNATURE_SM2, info,
-                null, beginDate, endDate, publicKey, privateKey);
-        certificate.verify(publicKey);
+        X509Certificate certificate = certService.createRootCertificate(SIGNATURE_SM2, info, null, beginDate, endDate, keyPair.getPublic(), keyPair.getPrivate());
+        certificate.verify(keyPair.getPublic());
         new File("out").mkdirs();
-        CertUtils.writeKey(privateKey, "out/ca.key");
-        CertUtils.writeCrt(certificate, "out/ca.crt");
+        FileUtil.writeUtf8String(encryptPrivateKey, FileUtil.newFile("out/gmca.key"));
+        CertUtils.writeCrt(certificate, "out/gmca.crt");
     }
 
-
-
-
     @Test
-    public void testCreateGMCertRequest() throws Exception {
+    public void testCreateCertRequest() throws Exception {
         X500NameInfo info = X500NameInfo.builder()
                 .commonName("agencyA")
                 .organizationalUnitName("agencyA")
                 .organizationName("fisco-bcos")
                 .build();
 
-        KeyPair keyPair = KeyUtils.generateSM2KeyPair();
+        CryptoKeyPair cryptoKeyPair = SM2KeyHandler.generateSM2KeyPair();
+        KeyPair keyPair = cryptoKeyPair.getKeyPair();
+        String encryptPrivateKey = PemEncrypt.encryptPrivateKey(Numeric.hexStringToByteArray(cryptoKeyPair.getHexPrivateKey()), EccTypeEnums.SM2P256V1);
 
-        BCECPublicKey publicKey = (BCECPublicKey) keyPair.getPublic();
-        BCECPrivateKey privateKey = (BCECPrivateKey) keyPair.getPrivate();
-
-        CertUtils.writeKey(privateKey, "out/agencyA.key");
-        PKCS10CertificationRequest request = certService.createCertRequest(info, publicKey, privateKey,
-                SIGNATURE_SM2);
-        CertUtils.writeCsr(request, "out/agencyA.csr");
-        CertUtils.readCsr("out/agencyA.csr");
+        PKCS10CertificationRequest request = certService.createCertRequest(info, keyPair.getPublic(), keyPair.getPrivate(), SIGNATURE_SM2);
+        FileUtil.writeUtf8String(encryptPrivateKey, FileUtil.newFile("out/gmagencyA.key"));
+        CertUtils.writeCsr(request, "out/gmagencyA.csr");
     }
 
-
     @Test
-    public void testCreateGMChildCertificate() throws Exception {
+    public void testCreateChildCertificate() throws Exception {
         Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + 3650 * 24L * 60L * 60L * 1000);
 
-        PKCS10CertificationRequest request = CertUtils.readCsr("out/agencyA.csr");
-        X509Certificate parentCert = CertUtils.readCrt("out/ca.crt");
-        PEMKeyPair pemKeyPair = CertUtils.readKey("out/ca.key");
-
-        PrivateKey privateKey = KeyFactory.getInstance("EC").generatePrivate(
-                new PKCS8EncodedKeySpec(pemKeyPair.getPrivateKeyInfo().getEncoded()));
-
+        PKCS10CertificationRequest request = CertUtils.readCsr("out/gmagencyA.csr");
+        X509Certificate parentCert = CertUtils.readCrt("out/gmca.crt");
+        String encryptPrivateKey = FileUtil.readString(FileUtil.newFile("out/gmca.key"), CharsetUtil.CHARSET_UTF_8);
+        PrivateKey privateKey = PemEncrypt.getPrivateKey(encryptPrivateKey);
 
         X509Certificate childCert = certService.createChildCertificate(true, SIGNATURE_SM2, parentCert,
                 request, null, beginDate, endDate, privateKey);
         childCert.verify(parentCert.getPublicKey());
-        CertUtils.writeCrt(childCert, "out/agencyA.crt");
+        CertUtils.writeCrt(childCert, "out/gmagencyA.crt");
     }
 
     @Test
-    public void testCreateGMNodeCertRequest() throws Exception {
+    public void testCreateNodeCertRequest() throws Exception {
         X500NameInfo info = X500NameInfo.builder()
                 .commonName("nodeA")
                 .organizationalUnitName("agencyA")
                 .organizationName("fisco-bcos")
                 .build();
 
-        KeyPair keyPair = KeyUtils.generateSM2KeyPair();
+        CryptoKeyPair cryptoKeyPair = SM2KeyHandler.generateSM2KeyPair();
+        KeyPair keyPair = cryptoKeyPair.getKeyPair();
+        String pemPrivateKey = PemEncrypt.encryptPrivateKey(Numeric.hexStringToByteArray(cryptoKeyPair.getHexPrivateKey()), EccTypeEnums.SM2P256V1);
 
-        BCECPublicKey publicKey = (BCECPublicKey) keyPair.getPublic();
-        BCECPrivateKey privateKey = (BCECPrivateKey) keyPair.getPrivate();
-
-        CertUtils.writeKey(privateKey, "out/nodeA.key");
-        PKCS10CertificationRequest request = certService.createCertRequest(info, publicKey, privateKey,
-                SIGNATURE_SM2);
-        CertUtils.writeCsr(request, "out/nodeA.csr");
-        CertUtils.readCsr("out/nodeA.csr");
+        PKCS10CertificationRequest request = certService.createCertRequest(info, keyPair.getPublic(), keyPair.getPrivate(), SIGNATURE_SM2);
+        FileUtil.writeUtf8String(pemPrivateKey, FileUtil.newFile("out/gmnode.key"));
+        CertUtils.writeCsr(request, "out/gmnode.csr");
     }
 
-
     @Test
-    public void testCreateGMAgencyChildCertificate() throws Exception {
+    public void testCreateAgencyChildCertificate() throws Exception {
         Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + 3650 * 24L * 60L * 60L * 1000);
 
-        PKCS10CertificationRequest request = CertUtils.readCsr("out/nodeA.csr");
-        X509Certificate parentCert = CertUtils.readCrt("out/agencyA.crt");
-        PEMKeyPair pemKeyPair = CertUtils.readKey("out/agencyA.key");
-
-        PrivateKey privateKey = KeyFactory.getInstance("EC").generatePrivate(
-                new PKCS8EncodedKeySpec(pemKeyPair.getPrivateKeyInfo().getEncoded()));
-
+        PKCS10CertificationRequest request = CertUtils.readCsr("out/gmnode.csr");
+        X509Certificate parentCert = CertUtils.readCrt("out/gmagencyA.crt");
+        String pemPrivateKey = FileUtil.readString(FileUtil.newFile("out/gmagencyA.key"), CharsetUtil.CHARSET_UTF_8);
+        PrivateKey privateKey = PemEncrypt.getPrivateKey(pemPrivateKey);
 
         X509Certificate childCert = certService.createChildCertificate(true, SIGNATURE_SM2, parentCert,
                 request, null, beginDate, endDate, privateKey);
         childCert.verify(parentCert.getPublicKey());
-        CertUtils.writeCrt(childCert, "out/nodeA.crt");
+        CertUtils.writeCrt(childCert, "out/gmnode.crt");
     }
+
+    @Test
+    public void testCreateEnNodeCertRequest() throws Exception {
+        X500NameInfo info = X500NameInfo.builder()
+                .commonName("nodeA")
+                .organizationalUnitName("agencyA")
+                .organizationName("fisco-bcos")
+                .build();
+
+        CryptoKeyPair cryptoKeyPair = SM2KeyHandler.generateSM2KeyPair();
+        KeyPair keyPair = cryptoKeyPair.getKeyPair();
+        String pemPrivateKey = PemEncrypt.encryptPrivateKey(Numeric.hexStringToByteArray(cryptoKeyPair.getHexPrivateKey()), EccTypeEnums.SM2P256V1);
+
+        PKCS10CertificationRequest request = certService.createCertRequest(info, keyPair.getPublic(), keyPair.getPrivate(), SIGNATURE_SM2);
+        FileUtil.writeUtf8String(pemPrivateKey, FileUtil.newFile("out/gmennode.key"));
+        CertUtils.writeCsr(request, "out/gmennode.csr");
+    }
+
+    @Test
+    public void testCreateAgencyChildEnCertificate() throws Exception {
+        Date beginDate = new Date();
+        Date endDate = new Date(beginDate.getTime() + 3650 * 24L * 60L * 60L * 1000);
+
+        PKCS10CertificationRequest request = CertUtils.readCsr("out/gmennode.csr");
+        X509Certificate parentCert = CertUtils.readCrt("out/gmagencyA.crt");
+        String pemPrivateKey = FileUtil.readString(FileUtil.newFile("out/gmagencyA.key"), CharsetUtil.CHARSET_UTF_8);
+        PrivateKey privateKey = PemEncrypt.getPrivateKey(pemPrivateKey);
+
+        X509Certificate childCert = certService.createChildCertificate(true, SIGNATURE_SM2, parentCert,
+                request, null, beginDate, endDate, privateKey);
+        childCert.verify(parentCert.getPublicKey());
+        CertUtils.writeCrt(childCert, "out/gmennode.crt");
+    }
+
+
+    @Test
+    public void testCreateSdkNodeCertRequest() throws Exception {
+        X500NameInfo info = X500NameInfo.builder()
+                .commonName("gmsdk")
+                .organizationalUnitName("agencyA")
+                .organizationName("fisco-bcos")
+                .build();
+
+        CryptoKeyPair cryptoKeyPair = SM2KeyHandler.generateSM2KeyPair();
+        KeyPair keyPair = cryptoKeyPair.getKeyPair();
+        String pemPrivateKey = PemEncrypt.encryptPrivateKey(Numeric.hexStringToByteArray(cryptoKeyPair.getHexPrivateKey()), EccTypeEnums.SM2P256V1);
+
+        PKCS10CertificationRequest request = certService.createCertRequest(info, keyPair.getPublic(), keyPair.getPrivate(), SIGNATURE_SM2);
+        FileUtil.writeUtf8String(pemPrivateKey, FileUtil.newFile("out/gmsdk.key"));
+        CertUtils.writeCsr(request, "out/gmsdk.csr");
+    }
+
+    @Test
+    public void testCreateAgencyChildSdkCertificate() throws Exception {
+        Date beginDate = new Date();
+        Date endDate = new Date(beginDate.getTime() + 3650 * 24L * 60L * 60L * 1000);
+
+        PKCS10CertificationRequest request = CertUtils.readCsr("out/gmsdk.csr");
+        X509Certificate parentCert = CertUtils.readCrt("out/gmagencyA.crt");
+        String pemPrivateKey = FileUtil.readString(FileUtil.newFile("out/gmagencyA.key"), CharsetUtil.CHARSET_UTF_8);
+        PrivateKey privateKey = PemEncrypt.getPrivateKey(pemPrivateKey);
+
+        X509Certificate childCert = certService.createChildCertificate(true, SIGNATURE_SM2, parentCert,
+                request, null, beginDate, endDate, privateKey);
+        childCert.verify(parentCert.getPublicKey());
+        CertUtils.writeCrt(childCert, "out/gmsdk.crt");
+    }
+
+    @Test
+    public void testCreateEnSdkNodeCertRequest() throws Exception {
+        X500NameInfo info = X500NameInfo.builder()
+                .commonName("gmensdk")
+                .organizationalUnitName("agencyA")
+                .organizationName("fisco-bcos")
+                .build();
+
+        CryptoKeyPair cryptoKeyPair = SM2KeyHandler.generateSM2KeyPair();
+        KeyPair keyPair = cryptoKeyPair.getKeyPair();
+        String pemPrivateKey = PemEncrypt.encryptPrivateKey(Numeric.hexStringToByteArray(cryptoKeyPair.getHexPrivateKey()), EccTypeEnums.SM2P256V1);
+
+        PKCS10CertificationRequest request = certService.createCertRequest(info, keyPair.getPublic(), keyPair.getPrivate(), SIGNATURE_SM2);
+        FileUtil.writeUtf8String(pemPrivateKey, FileUtil.newFile("out/gmensdk.key"));
+        CertUtils.writeCsr(request, "out/gmensdk.csr");
+    }
+
+    @Test
+    public void testCreateAgencyChildEnSdkCertificate() throws Exception {
+        Date beginDate = new Date();
+        Date endDate = new Date(beginDate.getTime() + 3650 * 24L * 60L * 60L * 1000);
+
+        PKCS10CertificationRequest request = CertUtils.readCsr("out/gmensdk.csr");
+        X509Certificate parentCert = CertUtils.readCrt("out/gmagencyA.crt");
+        String pemPrivateKey = FileUtil.readString(FileUtil.newFile("out/gmagencyA.key"), CharsetUtil.CHARSET_UTF_8);
+        PrivateKey privateKey = PemEncrypt.getPrivateKey(pemPrivateKey);
+
+        X509Certificate childCert = certService.createChildCertificate(true, SIGNATURE_SM2, parentCert,
+                request, null, beginDate, endDate, privateKey);
+        childCert.verify(parentCert.getPublicKey());
+        CertUtils.writeCrt(childCert, "out/gmensdk.crt");
+    }
+
+
+    @Test
+    public void testGetNodeId() throws Exception {
+        X509Certificate gmNodeCert = CertUtils.readCrt("out/gmnode.crt");
+        PublicKey publicKey = gmNodeCert.getPublicKey();
+        String gmNodeId = HexUtil.encodeHexStr(publicKey.getEncoded());
+        FileUtil.writeUtf8String(StrUtil.subByCodePoint(gmNodeId, 54, gmNodeId.length()), FileUtil.newFile("out/gmnode.nodeid"));
+
+    }
+
+
 }
