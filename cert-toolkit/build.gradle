@@ -41,7 +41,7 @@ dependencies {
 	compile 'com.lambdaworks:scrypt:1.4.0'
 	compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.60'
 	compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.60'
-	compile 'cn.hutool:hutool-all:5.7.9'
+	compile 'cn.hutool:hutool-core:5.7.9'
 	compile ('org.fisco-bcos.java-sdk:java-sdk:2.7.0')
 	extraLibs fileTree(dir:'libs',include:['*.jar'])
 	configurations.compile.extendsFrom(configurations.extraLibs)
