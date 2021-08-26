@@ -16,7 +16,6 @@
 package com.webank.cert.toolkit;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.StrUtil;
 import com.webank.cert.toolkit.encrypt.PemEncrypt;
@@ -28,8 +27,6 @@ import com.webank.cert.toolkit.utils.CertUtils;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.fisco.bcos.sdk.crypto.keypair.CryptoKeyPair;
-import org.fisco.bcos.sdk.crypto.keypair.SM2KeyPair;
-import org.fisco.bcos.sdk.crypto.keystore.KeyTool;
 import org.junit.Test;
 import org.web3j.utils.Numeric;
 
@@ -78,9 +75,9 @@ public class CertServiceGMTest extends BaseTest {
         X509Certificate certificate = certService.createRootCertificate(SIGNATURE_SM2, info,
                 null, beginDate, endDate, keyPair.getPublic(), keyPair.getPrivate());
         certificate.verify(keyPair.getPublic());
-        new File("out").mkdirs();
-        FileUtil.writeUtf8String(caKey, FileUtil.newFile("out/gmca1.key"));
-        CertUtils.writeCrt(certificate, "out/gmca1.crt");
+        new File("out/gm").mkdirs();
+        FileUtil.writeUtf8String(caKey, FileUtil.newFile("out/gm/gmca1.key"));
+        CertUtils.writeCrt(certificate, "out/gm/gmca1.crt");
     }
 
     @Test
@@ -105,8 +102,8 @@ public class CertServiceGMTest extends BaseTest {
         X509Certificate certificate = certService.createRootCertificate(SIGNATURE_SM2, info, keyUsage, beginDate, endDate, keyPair.getPublic(), keyPair.getPrivate());
         certificate.verify(keyPair.getPublic());
         new File("out").mkdirs();
-        FileUtil.writeUtf8String(encryptPrivateKey, FileUtil.newFile("out/gmca.key"));
-        CertUtils.writeCrt(certificate, "out/gmca.crt");
+        FileUtil.writeUtf8String(encryptPrivateKey, FileUtil.newFile("out/gm/gmca.key"));
+        CertUtils.writeCrt(certificate, "out/gm/gmca.crt");
     }
 
     @Test
@@ -122,8 +119,8 @@ public class CertServiceGMTest extends BaseTest {
         String encryptPrivateKey = PemEncrypt.encryptPrivateKey(Numeric.hexStringToByteArray(cryptoKeyPair.getHexPrivateKey()), EccTypeEnums.SM2P256V1);
 
         PKCS10CertificationRequest request = certService.createCertRequest(info, keyPair.getPublic(), keyPair.getPrivate(), SIGNATURE_SM2);
-        FileUtil.writeUtf8String(encryptPrivateKey, FileUtil.newFile("out/gmagencyA.key"));
-        CertUtils.writeCsr(request, "out/gmagencyA.csr");
+        FileUtil.writeUtf8String(encryptPrivateKey, FileUtil.newFile("out/gm/gmagencyA.key"));
+        CertUtils.writeCsr(request, "out/gm/gmagencyA.csr");
     }
 
     @Test
@@ -131,9 +128,9 @@ public class CertServiceGMTest extends BaseTest {
         Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + 3650 * 24L * 60L * 60L * 1000);
 
-        PKCS10CertificationRequest request = CertUtils.readCsr("out/gmagencyA.csr");
-        X509Certificate parentCert = CertUtils.readCrt("out/gmca.crt");
-        String encryptPrivateKey = FileUtil.readUtf8String(FileUtil.newFile("out/gmca.key"));
+        PKCS10CertificationRequest request = CertUtils.readCsr("out/gm/gmagencyA.csr");
+        X509Certificate parentCert = CertUtils.readCrt("out/gm/gmca.crt");
+        String encryptPrivateKey = FileUtil.readUtf8String(FileUtil.newFile("out/gm/gmca.key"));
         PrivateKey privateKey = PemEncrypt.getPrivateKey(encryptPrivateKey);
 
         KeyUsage keyUsage = new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
@@ -141,7 +138,7 @@ public class CertServiceGMTest extends BaseTest {
         X509Certificate childCert = certService.createChildCertificate(true, SIGNATURE_SM2, parentCert,
                 request, keyUsage, beginDate, endDate, privateKey);
         childCert.verify(parentCert.getPublicKey());
-        CertUtils.writeCrt(childCert, "out/gmagencyA.crt");
+        CertUtils.writeCrt(childCert, "out/gm/gmagencyA.crt");
     }
 
     @Test
@@ -157,8 +154,8 @@ public class CertServiceGMTest extends BaseTest {
         String pemPrivateKey = PemEncrypt.encryptPrivateKey(Numeric.hexStringToByteArray(cryptoKeyPair.getHexPrivateKey()), EccTypeEnums.SM2P256V1);
 
         PKCS10CertificationRequest request = certService.createCertRequest(info, keyPair.getPublic(), keyPair.getPrivate(), SIGNATURE_SM2);
-        FileUtil.writeUtf8String(pemPrivateKey, FileUtil.newFile("out/gmnode.key"));
-        CertUtils.writeCsr(request, "out/gmnode.csr");
+        FileUtil.writeUtf8String(pemPrivateKey, FileUtil.newFile("out/gm/gmnode.key"));
+        CertUtils.writeCsr(request, "out/gm/gmnode.csr");
 
     }
 
@@ -167,9 +164,9 @@ public class CertServiceGMTest extends BaseTest {
         Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + 3650 * 24L * 60L * 60L * 1000);
 
-        PKCS10CertificationRequest request = CertUtils.readCsr("out/gmnode.csr");
-        X509Certificate parentCert = CertUtils.readCrt("out/gmagencyA.crt");
-        String pemPrivateKey = FileUtil.readUtf8String(FileUtil.newFile("out/gmagencyA.key"));
+        PKCS10CertificationRequest request = CertUtils.readCsr("out/gm/gmnode.csr");
+        X509Certificate parentCert = CertUtils.readCrt("out/gm/gmagencyA.crt");
+        String pemPrivateKey = FileUtil.readUtf8String(FileUtil.newFile("out/gm/gmagencyA.key"));
         PrivateKey privateKey = PemEncrypt.getPrivateKey(pemPrivateKey);
 
         KeyUsage keyUsage = new KeyUsage(KeyUsage.digitalSignature | KeyUsage.nonRepudiation);
@@ -177,21 +174,21 @@ public class CertServiceGMTest extends BaseTest {
         X509Certificate childCert = certService.createChildCertificate(false, SIGNATURE_SM2, parentCert,
                 request, keyUsage, beginDate, endDate, privateKey);
         childCert.verify(parentCert.getPublicKey());
-        CertUtils.writeCrt(childCert, "out/gmnode.crt");
+        CertUtils.writeCrt(childCert, "out/gm/gmnode.crt");
     }
 
     @Test
     public void testAppendAgencyCrt2Node() throws Exception {
-        String agencyStr = FileUtil.readUtf8String(FileUtil.newFile("out/gmagencyA.crt"));
-        FileUtil.appendUtf8String(agencyStr, FileUtil.newFile("out/gmnode.crt"));
+        String agencyStr = FileUtil.readUtf8String(FileUtil.newFile("out/gm/gmagencyA.crt"));
+        FileUtil.appendUtf8String(agencyStr, FileUtil.newFile("out/gm/gmnode.crt"));
     }
 
     @Test
     public void testCopyNodeSdk() throws Exception {
-        String nodeStr = FileUtil.readUtf8String(FileUtil.newFile("out/gmnode.crt"));
-        FileUtil.writeUtf8String(nodeStr, FileUtil.newFile("out/gmsdk.crt"));
-        String keyStr = FileUtil.readUtf8String(FileUtil.newFile("out/gmnode.key"));
-        FileUtil.writeUtf8String(keyStr, FileUtil.newFile("out/gmsdk.key"));
+        String nodeStr = FileUtil.readUtf8String(FileUtil.newFile("out/gm/gmnode.crt"));
+        FileUtil.writeUtf8String(nodeStr, FileUtil.newFile("out/gm/gmsdk.crt"));
+        String keyStr = FileUtil.readUtf8String(FileUtil.newFile("out/gm/gmnode.key"));
+        FileUtil.writeUtf8String(keyStr, FileUtil.newFile("out/gm/gmsdk.key"));
     }
 
     @Test
@@ -207,8 +204,8 @@ public class CertServiceGMTest extends BaseTest {
         String pemPrivateKey = PemEncrypt.encryptPrivateKey(Numeric.hexStringToByteArray(cryptoKeyPair.getHexPrivateKey()), EccTypeEnums.SM2P256V1);
 
         PKCS10CertificationRequest request = certService.createCertRequest(info, keyPair.getPublic(), keyPair.getPrivate(), SIGNATURE_SM2);
-        FileUtil.writeUtf8String(pemPrivateKey, FileUtil.newFile("out/gmennode.key"));
-        CertUtils.writeCsr(request, "out/gmennode.csr");
+        FileUtil.writeUtf8String(pemPrivateKey, FileUtil.newFile("out/gm/gmennode.key"));
+        CertUtils.writeCsr(request, "out/gm/gmennode.csr");
     }
 
     @Test
@@ -216,9 +213,9 @@ public class CertServiceGMTest extends BaseTest {
         Date beginDate = new Date();
         Date endDate = new Date(beginDate.getTime() + 3650 * 24L * 60L * 60L * 1000);
 
-        PKCS10CertificationRequest request = CertUtils.readCsr("out/gmennode.csr");
-        X509Certificate parentCert = CertUtils.readCrt("out/gmagencyA.crt");
-        String pemPrivateKey = FileUtil.readUtf8String(FileUtil.newFile("out/gmagencyA.key"));
+        PKCS10CertificationRequest request = CertUtils.readCsr("out/gm/gmennode.csr");
+        X509Certificate parentCert = CertUtils.readCrt("out/gm/gmagencyA.crt");
+        String pemPrivateKey = FileUtil.readUtf8String(FileUtil.newFile("out/gm/gmagencyA.key"));
         PrivateKey privateKey = PemEncrypt.getPrivateKey(pemPrivateKey);
 
         KeyUsage keyUsage = new KeyUsage(KeyUsage.keyEncipherment | KeyUsage.dataEncipherment | KeyUsage.keyAgreement);
@@ -226,25 +223,25 @@ public class CertServiceGMTest extends BaseTest {
         X509Certificate childCert = certService.createChildCertificate(false, SIGNATURE_SM2, parentCert,
                 request, keyUsage, beginDate, endDate, privateKey);
         childCert.verify(parentCert.getPublicKey());
-        CertUtils.writeCrt(childCert, "out/gmennode.crt");
+        CertUtils.writeCrt(childCert, "out/gm/gmennode.crt");
     }
 
 
     @Test
     public void testCopyEnNodeSdk() throws Exception {
-        String nodeStr = FileUtil.readUtf8String(FileUtil.newFile("out/gmennode.crt"));
-        FileUtil.writeUtf8String(nodeStr, FileUtil.newFile("out/gmensdk.crt"));
-        String keyStr = FileUtil.readUtf8String(FileUtil.newFile("out/gmennode.key"));
-        FileUtil.writeUtf8String(keyStr, FileUtil.newFile("out/gmensdk.key"));
+        String nodeStr = FileUtil.readUtf8String(FileUtil.newFile("out/gm/gmennode.crt"));
+        FileUtil.writeUtf8String(nodeStr, FileUtil.newFile("out/gm/gmensdk.crt"));
+        String keyStr = FileUtil.readUtf8String(FileUtil.newFile("out/gm/gmennode.key"));
+        FileUtil.writeUtf8String(keyStr, FileUtil.newFile("out/gm/gmensdk.key"));
     }
 
 
     @Test
     public void testGetNodeId() throws Exception {
-        X509Certificate gmNodeCert = CertUtils.readCrt("out/gmnode.crt");
+        X509Certificate gmNodeCert = CertUtils.readCrt("out/gm/gmnode.crt");
         PublicKey publicKey = gmNodeCert.getPublicKey();
         String gmNodeId = HexUtil.encodeHexStr(publicKey.getEncoded());
-        FileUtil.writeUtf8String(StrUtil.subByCodePoint(gmNodeId, 54, gmNodeId.length()), FileUtil.newFile("out/gmnode.nodeid"));
+        FileUtil.writeUtf8String(StrUtil.subByCodePoint(gmNodeId, 54, gmNodeId.length()), FileUtil.newFile("out/gm/gmnode.nodeid"));
 
     }
 
