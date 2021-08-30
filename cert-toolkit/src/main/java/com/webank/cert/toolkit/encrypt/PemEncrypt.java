@@ -31,6 +31,7 @@ import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.util.io.pem.PemWriter;
 import org.fisco.bcos.sdk.crypto.keypair.CryptoKeyPair;
+import org.fisco.bcos.sdk.crypto.keypair.ECDSAKeyPair;
 import org.fisco.bcos.sdk.crypto.keypair.SM2KeyPair;
 import org.web3j.utils.Numeric;
 
@@ -41,7 +42,6 @@ import java.io.StringReader;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.Security;
 import java.security.spec.PKCS8EncodedKeySpec;
 
@@ -61,10 +61,18 @@ public class PemEncrypt {
         }
     }
 
-    public static CryptoKeyPair getCryptKeyPair(byte[] privateKey, EccTypeEnums eccTypeEnums) {
-        return new SM2KeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
 
-    }
+	public static CryptoKeyPair getCryptKeyPair(byte[] privateKey, EccTypeEnums eccTypeEnums){
+		if(CryptoKeyPair.ECDSA_CURVE_NAME.equals(eccTypeEnums.getEccName())){
+			return new ECDSAKeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
+		}
+		else if(CryptoKeyPair.SM2_CURVE_NAME.equals(eccTypeEnums.getEccName())){
+			return new SM2KeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
+		}
+		else{
+			throw new IllegalArgumentException("unrecognised ecc type" + eccTypeEnums.getEccName());
+		}
+	}
 
     public static String encryptPrivateKey(byte[] privateKey, EccTypeEnums eccTypeEnums)
             throws Exception {
