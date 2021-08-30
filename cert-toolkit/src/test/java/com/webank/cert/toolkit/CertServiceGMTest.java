@@ -51,11 +51,11 @@ public class CertServiceGMTest extends BaseTest {
 
     private static final String SIGNATURE_SM2 = "SM3WITHSM2";
 
-    private String caKey = "-----BEGIN PRIVATE KEY-----\n" +
-            "MIGHAgEAMBMGByqGSM49AgEGCCqBHM9VAYItBG0wawIBAQQgKlhdkyDVEyXTNKwB\n" +
-            "LxG0DIY1LRkvIl0OVIYxMpirSwGhRANCAATbwLNhEtyBheIYfZc/2NWXNLzDiNZI\n" +
-            "S6ZEqJnLJcQvUBjfMqDla3hqnCDGLODgqUV81b+m1E0JzF9tEap+RwWb\n" +
-            "-----END PRIVATE KEY-----\n";
+    private String caKey = "-----BEGIN PRIVATE KEY-----\r\n" +
+            "MIGHAgEAMBMGByqGSM49AgEGCCqBHM9VAYItBG0wawIBAQQgKlhdkyDVEyXTNKwB\r\n" +
+            "LxG0DIY1LRkvIl0OVIYxMpirSwGhRANCAATbwLNhEtyBheIYfZc/2NWXNLzDiNZI\r\n" +
+            "S6ZEqJnLJcQvUBjfMqDla3hqnCDGLODgqUV81b+m1E0JzF9tEap+RwWb\r\n" +
+            "-----END PRIVATE KEY-----\r\n";
 
 
     @Test
@@ -101,7 +101,7 @@ public class CertServiceGMTest extends BaseTest {
 
         X509Certificate certificate = certService.createRootCertificate(SIGNATURE_SM2, info, keyUsage, beginDate, endDate, keyPair.getPublic(), keyPair.getPrivate());
         certificate.verify(keyPair.getPublic());
-        new File("out").mkdirs();
+        new File("out/gm").mkdirs();
         FileUtil.writeUtf8String(encryptPrivateKey, FileUtil.newFile("out/gm/gmca.key"));
         CertUtils.writeCrt(certificate, "out/gm/gmca.crt");
     }
