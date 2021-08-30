@@ -61,6 +61,7 @@ public class PemEncrypt {
         }
     }
 
+
 	public static CryptoKeyPair getCryptKeyPair(byte[] privateKey, EccTypeEnums eccTypeEnums){
 		if(CryptoKeyPair.ECDSA_CURVE_NAME.equals(eccTypeEnums.getEccName())){
 			return new ECDSAKeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
