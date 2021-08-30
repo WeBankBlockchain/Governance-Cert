@@ -22,10 +22,9 @@ WeBankBlockchain-Governance-Cert提供了证书生命周期管理的解决方案
 
 
 ## 文档
-- [**中文**](https://gov-doc.readthedocs.io/zh_CN/latest/docs/WeBankBlockchain-Gov-Cert/index.html)
-- [**cer-toolkit使用**](https://gov-doc.readthedocs.io/zh_CN/latest/docs/WeBankBlockchain-Gov-Cert/quickstart1.html)
-- [**cert-mgr使用**](https://gov-doc.readthedocs.io/zh_CN/latest/docs/WeBankBlockchain-Gov-Cert/quickstart2.html)
-
+- [**中文**](https://governance-doc.readthedocs.io/zh_CN/latest/docs/WeBankBlockchain-Governance-Cert/index.html)
+- [**cer-toolkit使用**](https://governance-doc.readthedocs.io/zh_CN/latest/docs/WeBankBlockchain-Governance-Cert/quickstart1.html)
+- [**cert-mgr使用**](https://governance-doc.readthedocs.io/zh_CN/latest/docs/WeBankBlockchain-Governance-Cert/quickstart2.html)
 
 
 ## 贡献代码
@@ -34,9 +33,6 @@ WeBankBlockchain-Governance-Cert提供了证书生命周期管理的解决方案
 - 欢迎提交代码(Pull requests)。
 - [提问和提交BUG](https://github.com/WeBankBlockchain/Governance-Cert/issues)。
 - 如果发现代码存在安全漏洞，请在[这里](https://security.webank.com)上报。
-
-
-![](https://media.githubusercontent.com/media/FISCO-BCOS/LargeFiles/master/images/QR_image.png)
 
 
 ## License
