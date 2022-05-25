@@ -42,7 +42,7 @@ dependencies {
 	compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.60'
 	compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.60'
 	compile 'cn.hutool:hutool-core:5.7.9'
-	compile ('org.fisco-bcos.java-sdk:java-sdk:2.7.0')
+	compile ('org.fisco-bcos.java-sdk:fisco-bcos-java-sdk:2.9.0')
 	extraLibs fileTree(dir:'libs',include:['*.jar'])
 	configurations.compile.extendsFrom(configurations.extraLibs)
 }

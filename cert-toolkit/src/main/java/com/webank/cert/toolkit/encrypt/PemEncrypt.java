@@ -61,17 +61,15 @@ public class PemEncrypt {
         }
     }
 
-	public static CryptoKeyPair getCryptKeyPair(byte[] privateKey, EccTypeEnums eccTypeEnums){
-		if(CryptoKeyPair.ECDSA_CURVE_NAME.equals(eccTypeEnums.getEccName())){
-			return new ECDSAKeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
-		}
-		else if(CryptoKeyPair.SM2_CURVE_NAME.equals(eccTypeEnums.getEccName())){
-			return new SM2KeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
-		}
-		else{
-			throw new IllegalArgumentException("unrecognised ecc type" + eccTypeEnums.getEccName());
-		}
-	}
+    public static CryptoKeyPair getCryptKeyPair(byte[] privateKey, EccTypeEnums eccTypeEnums) {
+        if (CryptoKeyPair.ECDSA_CURVE_NAME.equals(eccTypeEnums.getEccName())) {
+            return new ECDSAKeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
+        } else if (CryptoKeyPair.SM2_CURVE_NAME.equals(eccTypeEnums.getEccName())) {
+            return new SM2KeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
+        } else {
+            throw new IllegalArgumentException("unrecognised ecc type" + eccTypeEnums.getEccName());
+        }
+    }
 
     public static String encryptPrivateKey(byte[] privateKey, EccTypeEnums eccTypeEnums)
             throws Exception {
@@ -81,9 +79,7 @@ public class PemEncrypt {
         //1. Encapsulate curve meta info and private key bytes in PKCS#8 format
         ASN1ObjectIdentifier curveOid = ECUtil.getNamedCurveOid(eccTypeEnums.getEccName());
         X962Parameters params = new X962Parameters(curveOid);
-        ECPrivateKey keyStructure = new ECPrivateKey(256, key,
-                new DERBitString(Numeric.hexStringToByteArray(cryptoKeyPair.getHexPublicKey())),
-                null);
+        ECPrivateKey keyStructure = getEcPrivateKey(cryptoKeyPair, key, eccTypeEnums);
         PrivateKeyInfo privateKeyInfo = new PrivateKeyInfo(
                 new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, params),
                 keyStructure);
@@ -105,6 +101,21 @@ public class PemEncrypt {
             } catch (Exception e) {
             }
         }
+    }
+
+    private static ECPrivateKey getEcPrivateKey(CryptoKeyPair cryptoKeyPair, BigInteger key, EccTypeEnums eccTypeEnums) {
+
+        String hexPublicKey = cryptoKeyPair.getHexPublicKey();
+        if (CryptoKeyPair.ECDSA_CURVE_NAME.equals(eccTypeEnums.getEccName())) {
+
+        } else if (CryptoKeyPair.SM2_CURVE_NAME.equals(eccTypeEnums.getEccName())) {
+            hexPublicKey = "04" + hexPublicKey;
+        } else {
+            throw new IllegalArgumentException("unrecognised ecc type" + eccTypeEnums.getEccName());
+        }
+        return new ECPrivateKey(256, key,
+                new DERBitString(Numeric.hexStringToByteArray(hexPublicKey)),
+                null);
     }
 
     public static byte[] decryptPrivateKey(String encryptPrivateKey) throws Exception {
