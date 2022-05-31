@@ -61,15 +61,19 @@ public class PemEncrypt {
         }
     }
 
-    public static CryptoKeyPair getCryptKeyPair(byte[] privateKey, EccTypeEnums eccTypeEnums) {
-        if (CryptoKeyPair.ECDSA_CURVE_NAME.equals(eccTypeEnums.getEccName())) {
-            return new ECDSAKeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
-        } else if (CryptoKeyPair.SM2_CURVE_NAME.equals(eccTypeEnums.getEccName())) {
-            return new SM2KeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
-        } else {
-            throw new IllegalArgumentException("unrecognised ecc type" + eccTypeEnums.getEccName());
-        }
-    }
+
+
+	public static CryptoKeyPair getCryptKeyPair(byte[] privateKey, EccTypeEnums eccTypeEnums){
+		if(CryptoKeyPair.ECDSA_CURVE_NAME.equals(eccTypeEnums.getEccName())){
+			return new ECDSAKeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
+		}
+		else if(CryptoKeyPair.SM2_CURVE_NAME.equals(eccTypeEnums.getEccName())){
+			return new SM2KeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
+		}
+		else{
+			throw new IllegalArgumentException("unrecognised ecc type" + eccTypeEnums.getEccName());
+		}
+	}
 
     public static String encryptPrivateKey(byte[] privateKey, EccTypeEnums eccTypeEnums)
             throws Exception {
