@@ -51,7 +51,6 @@ public class CertServiceGMTest extends BaseTest {
 
     private static final String SIGNATURE_SM2 = "SM3WITHSM2";
 
-
     private String caKey = "-----BEGIN PRIVATE KEY-----\r\n" +
             "MIGHAgEAMBMGByqGSM49AgEGCCqBHM9VAYItBG0wawIBAQQgKlhdkyDVEyXTNKwB\r\n" +
             "LxG0DIY1LRkvIl0OVIYxMpirSwGhRANCAATbwLNhEtyBheIYfZc/2NWXNLzDiNZI\r\n" +

@@ -62,6 +62,7 @@ public class PemEncrypt {
     }
 
 
+
 	public static CryptoKeyPair getCryptKeyPair(byte[] privateKey, EccTypeEnums eccTypeEnums){
 		if(CryptoKeyPair.ECDSA_CURVE_NAME.equals(eccTypeEnums.getEccName())){
 			return new ECDSAKeyPair().createKeyPair(KeyPresenter.asBigInteger(privateKey));
@@ -82,9 +83,7 @@ public class PemEncrypt {
         //1. Encapsulate curve meta info and private key bytes in PKCS#8 format
         ASN1ObjectIdentifier curveOid = ECUtil.getNamedCurveOid(eccTypeEnums.getEccName());
         X962Parameters params = new X962Parameters(curveOid);
-        ECPrivateKey keyStructure = new ECPrivateKey(256, key,
-                new DERBitString(Numeric.hexStringToByteArray(cryptoKeyPair.getHexPublicKey())),
-                null);
+        ECPrivateKey keyStructure = getEcPrivateKey(cryptoKeyPair, key, eccTypeEnums);
         PrivateKeyInfo privateKeyInfo = new PrivateKeyInfo(
                 new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, params),
                 keyStructure);
@@ -106,6 +105,13 @@ public class PemEncrypt {
             } catch (Exception e) {
             }
         }
+    }
+
+    private static ECPrivateKey getEcPrivateKey(CryptoKeyPair cryptoKeyPair, BigInteger key, EccTypeEnums eccTypeEnums) {
+
+        return new ECPrivateKey(256, key,
+                new DERBitString(Numeric.hexStringToByteArray("04" + cryptoKeyPair.getHexPublicKey())),
+                null);
     }
 
     public static byte[] decryptPrivateKey(String encryptPrivateKey) throws Exception {
