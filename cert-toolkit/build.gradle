@@ -2,13 +2,15 @@
 apply plugin: 'maven'
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'signing'
+
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = '0.0.1'
+version = '1.0.1-SNAPSHOT'
 
-group = 'com.webank.certtool'
+group = 'com.webank'
 
 repositories {
 	maven {
@@ -55,6 +57,22 @@ configurations {
 	}
 }
 
+task sourcesJar(type: Jar) {
+	from sourceSets.main.allJava
+	archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+	from javadoc
+	archiveClassifier = 'javadoc'
+}
+
+artifacts {
+	archives jar
+	archives sourcesJar
+	archives javadocJar
+}
+
 sourceSets {
 	main {
 		java {
@@ -72,10 +90,62 @@ javadoc {
 	options.addStringOption('charSet', 'UTF-8')
 }
 
+artifacts {
+	archives jar
+	archives sourcesJar
+	archives javadocJar
+}
+
+signing {
+	required { gradle.taskGraph.hasTask("uploadArchives") }
+	sign configurations.archives
+}
+
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			beforeDeployment { deployment -> signing.signPom(deployment) }
+
+			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+				authentication(userName: ossrhUsername, password: ossrhPassword)
+			}
+
+			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
+			pom.project {
+				name project.name
+				packaging 'jar'
+				description 'WeBankBlockchain Governance-Cert'
+				url 'https://github.com/WeBankBlockchain/Governance-Cert.git'
+
+				scm {
+					url 'https://github.com/WeBankBlockchain/Governance-Cert.git'
+					connection 'https://github.com/WeBankBlockchain/Governance-Cert.git'
+				}
+
+
+				licenses {
+					license {
+						name 'The Apache License, Version 2.0'
+						url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					}
+				}
+				developers {
+					developer {
+						id 'wesleywang'
+						name 'wangyue'
+					}
+				}
+			}
+		}
+	}
+}
+
 jar {
 	enabled = true
 	destinationDir file('dist')
-	archiveName project.name + '.jar'
+	archiveName project.name + '-' + version +'.jar'
 	exclude '**/*.xml'
 	exclude '**/*.properties'
 	exclude '**/*.yml'
